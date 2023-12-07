@@ -53,13 +53,11 @@ section.hero {
 }
 
 form {
-/*            width: 300px;
-*/            padding: 20px;
-    margin: 25px 50px;
-    background-color: #fff;
+    padding: 20px;
+    margin: 25px 100px;
+    background-color: #ddd;
     border-radius: 8px;
-/*            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-*/        }
+}
 
 label {
     display: block;
@@ -77,7 +75,7 @@ input, textarea {
 }
 
 button {
-    background-color: #4caf50;
+    background-color: #666;
     color: #fff;
     padding: 10px 15px;
     border: none;
