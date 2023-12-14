@@ -8,7 +8,7 @@ body {
 
 section.hero {
     position: relative;
-    background: url('../images/view-from-office.png') center/cover no-repeat; /* Replace with your image path */
+    background: url('../images/view-from-office.jpg') center/cover no-repeat; /* Replace with your image path */
     color: #fff;
     text-align: center;
     display: flex;
