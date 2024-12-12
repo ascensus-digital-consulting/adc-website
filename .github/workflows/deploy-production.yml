@@ -1,6 +1,7 @@
 name: Deploy Website to Production Environment
 run-name: ${{ github.actor }} is deploying the website to production
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
