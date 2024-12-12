@@ -1,6 +1,6 @@
 {
   "id": 2955243,
-  "name": "protect-main-branch",
+  "name": "enforce-pr-process",
   "target": "branch",
   "source_type": "Repository",
   "source": "ascensus-digital-consulting/adc-website",
