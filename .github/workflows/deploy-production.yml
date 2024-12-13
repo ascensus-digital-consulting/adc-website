@@ -23,7 +23,7 @@ jobs:
     
     steps:
       - name: Test code
-        run: echo "TODO - implement code testing via Jest"
+        run: nom test"
 
   test-security:
     runs-on: ubuntu-latest
