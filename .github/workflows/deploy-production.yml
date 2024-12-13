@@ -8,7 +8,7 @@ on:
       
 jobs:
   measure-code:
-    runs-on: ${{ vars.DEFAULT_RUNNER }}
+    runs-on: ${{ vars.RUNNER_OS }}-${{ vars.RUNNER_OS_VERSION }}
     timeout-minutes: 10
     environment: production
     
