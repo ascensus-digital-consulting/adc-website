@@ -1,5 +1,5 @@
 name: Website release [production]
-run-name: ${{ github.actor }} is deploying the website to production
+run-name: ${{ github.actor }} is deploying the ADC web application to production
 on:
   workflow_dispatch:
   push:
