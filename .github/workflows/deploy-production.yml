@@ -23,7 +23,7 @@ jobs:
     
     steps:
       - name: Test code
-        run: nom test"
+        run: npm test"
 
   test-security:
     runs-on: ubuntu-latest
