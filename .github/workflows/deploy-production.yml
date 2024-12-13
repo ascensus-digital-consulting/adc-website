@@ -8,13 +8,15 @@ on:
       
 jobs:
   measure-code:
-    runs-on: ${{ vars.RUNNER_OS }}-${{ vars.RUNNER_OS_VERSION }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: production
     
     steps:
       - name: Gather metrics
         run: echo "TODO - implement code metrics via SonarQube"
+      - name: log 
+        run: echo ${{ vars.RUNNER_OS }}-${{ vars.RUNNER_OS_VERSION }}
 
   test-code:
     runs-on: ubuntu-24.04
