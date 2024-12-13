@@ -73,7 +73,7 @@ jobs:
           files-to-include: '{.*/**,**}'
   
   smoke-test:
-    runs-on: $DEFAULT_RUNNER
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: production
     needs: deploy
