@@ -2,5 +2,8 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "webpack": "^5.97.1"
+  },
+  "scripts": {
+    "test": "jest"
   }
 }
