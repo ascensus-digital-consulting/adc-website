@@ -1,6 +1,5 @@
 class HelloWorld {
-  constructor() {}
-
+  // example code for unit testing
   render() {
     return 'Hello World!';
   }
