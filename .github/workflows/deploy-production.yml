@@ -13,7 +13,7 @@ jobs:
     environment: production
     
     steps:
-      - name: Code measurment
+      - name: Gather metrics
         run: echo "TODO - implement code metrics via SonarQube"
 
   test-code:
@@ -22,7 +22,7 @@ jobs:
     environment: production
     
     steps:
-      - name: Code testing
+      - name: Test code
         run: echo "TODO - implement code testing via Jest"
 
   test-security:
@@ -31,7 +31,7 @@ jobs:
     environment: production
     
     steps:
-      - name: Security testing
+      - name: Test application security
         run: echo "TODO - implement security testing via Snyk (maybe?)"
 
   deploy:
@@ -41,19 +41,25 @@ jobs:
     needs: [measure-code, test-code, test-security]
     
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
+        
+      - name: Configure node.js
       - uses: actions/setup-node@v2
         with:
           node-version: 23.4.0
+          
       - name: Install dependencies
         run: npm install
-      - name: Set AWS credentials
+        
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
-      - name: Deploy
+          
+      - name: Deploy application
         uses: reggionick/s3-deploy@v4
         with:
           folder: app/src
@@ -67,11 +73,12 @@ jobs:
           files-to-include: '{.*/**,**}'
   
   smoke-test:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ variables.DEFAULT_RUNNER }}
+#    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: production
     needs: deploy
     
     steps:
-      - name: Moke testing
+      - name: Smoke test
         run: echo "TODO - implement smoke testing. Tech stack decision pending..."
