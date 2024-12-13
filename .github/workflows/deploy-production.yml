@@ -7,12 +7,13 @@ on:
       - main
       
 env:
+  DEFAULT_RUNNER: ubuntu-24.04
   RUNNER_OS: ubuntu
   RUNNER_OS_VERSION: 24.04
       
 jobs:
   measure-code:
-    runs-on: $RUNNER_OS-$RUNNER_OS_VERSION
+    runs-on: $DEFAULT_RUNNER
     timeout-minutes: 10
     environment: production
     
@@ -20,7 +21,7 @@ jobs:
       - name: Gather metrics
         run: echo "TODO - implement code metrics via SonarQube"
       - name: log 
-        run: echo $RUNNER_OS-$RUNNER_OS_VERSION
+        run: echo $DEFAULT_RUNNER
 
   test-code:
     runs-on: ubuntu-24.04
