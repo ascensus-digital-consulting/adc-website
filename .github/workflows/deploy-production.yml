@@ -41,10 +41,7 @@ jobs:
     needs: [measure-code, test-code, test-security]
     
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        
-      - name: Configure node.js
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 23.4.0
