@@ -12,7 +12,7 @@ env:
       
 jobs:
   measure-code:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ env.RUNNER_OS }}-${{ env.RUNNER_OS_VERSION }}
     timeout-minutes: 10
     environment: production
     
