@@ -13,11 +13,16 @@ jobs:
     environment: production
     
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Gather metrics
-        run: echo "TODO - implement code metrics via SonarQube"
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   test-code:
     runs-on: ubuntu-latest
@@ -25,7 +30,7 @@ jobs:
     environment: production
     
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
           
       - name: Install dependencies
@@ -90,7 +95,7 @@ jobs:
     needs: [measure-code, test-code, test-security]
     
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
           
       - name: Install dependencies
