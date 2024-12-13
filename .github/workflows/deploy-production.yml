@@ -73,7 +73,7 @@ jobs:
           files-to-include: '{.*/**,**}'
   
   smoke-test:
-    runs-on: ${{ env.DEFAULT_RUNNER }}
+    runs-on: $DEFAULT_RUNNER
     timeout-minutes: 10
     environment: production
     needs: deploy
