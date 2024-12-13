@@ -1,4 +1,4 @@
-name: Deploy Website to Production Environment
+name: Website release [production]
 run-name: ${{ github.actor }} is deploying the website to production
 on:
   workflow_dispatch:
@@ -6,7 +6,28 @@ on:
     branches:
       - main
 jobs:
-  deploy-website:
+  measure-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Code measurment
+        run: echo "TODO - implement code metrics via SonarQube"
+  test-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Code testing
+        run: echo "TODO - implement code testing via Jest"
+  test-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Security testing
+        run: echo "TODO - implement security testing via Snyk (maybe?)"
+  deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
@@ -35,3 +56,10 @@ jobs:
           no-cache: true
           private: true
           files-to-include: '{.*/**,**}'
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Moke testing
+        run: echo "TODO - implement smoke testing. Tech stack decision pending..."
