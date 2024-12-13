@@ -5,32 +5,41 @@ on:
   push:
     branches:
       - main
+      
 jobs:
   measure-code:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    
     steps:
       - name: Code measurment
         run: echo "TODO - implement code metrics via SonarQube"
+
   test-code:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    
     steps:
       - name: Code testing
         run: echo "TODO - implement code testing via Jest"
+
   test-security:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    
     steps:
       - name: Security testing
         run: echo "TODO - implement security testing via Snyk (maybe?)"
+
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    needs: [measure-code, test-code, test-security]
+    
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -56,10 +65,13 @@ jobs:
           no-cache: true
           private: true
           files-to-include: '{.*/**,**}'
+  
   smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    needs: deploy
+    
     steps:
       - name: Moke testing
         run: echo "TODO - implement smoke testing. Tech stack decision pending..."
