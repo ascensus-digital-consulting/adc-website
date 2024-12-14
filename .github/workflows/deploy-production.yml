@@ -129,4 +129,4 @@ jobs:
     
     steps:
       - name: Smoke test
-        run: curl -o /dev/null --silent --head --write-out '%{http_code}\n' https://ascensus.digital/
+        run: bash app/test/scripts/smoke-test.sh
