@@ -129,4 +129,4 @@ jobs:
     
     steps:
       - name: Smoke test
-        run: bash app/test/scripts/smoke-test.sh
+        run: bash app/test/scripts/smoke-test.sh https://ascensus.digital
