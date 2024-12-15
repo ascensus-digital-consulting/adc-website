@@ -2,7 +2,6 @@
 url=$1
 export TERM=xterm-256color
 
-
 tput setaf 3
 echo "Initiating smoke test against $url"
 http_response=$(curl -o /dev/null --silent --write-out '%{http_code}\n' $url)
