@@ -12,11 +12,13 @@ jobs:
       - name: Check branch
         run: |
           ALLOWED_BRANCH="stage"
-            if [[ $GIT_REFLOG_ACTION == *$ALLOWED_BRANCH* ]]; then
+          echo GITHUB_HEAD_REF = $GITHUB_HEAD_REF
+          echo ALLOWED_BRANCH = $ALLOWED_BRANCH
+          echo GIT_REFLOG_ACTION = $GIT_REFLOG_ACTION
+            if [[ $GIT_REFLOG_ACTION == $ALLOWED_BRANCH ]]; then
               echo
               echo \#
-              echo \# Merging from \"main\" to \"$ALLOWED_BRANCH\" is prohibited.
-              echo \#
+              echo \# Merging from \"$ALLOWED_BRANCH\" to \"main\" is prohibited.
               echo \#
               echo
               exit 1
