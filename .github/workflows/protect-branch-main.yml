@@ -12,8 +12,7 @@ jobs:
       - name: Check branch
         run: |
           ALLOWED_BRANCH="stage"
-          if [[ $GIT_REFLOG_ACTION == *merge* ]]; then
-          	if [[ $GIT_REFLOG_ACTION == *$ALLOWED_BRANCH* ]]; then
+          	if [[ ${GITHUB_HEAD_REF} != *$ALLOWED_BRANCH* ]]; then
           		echo
           		echo \# STOP THE PRESSES!
           		echo \#
