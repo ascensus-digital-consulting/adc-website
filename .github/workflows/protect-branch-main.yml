@@ -12,17 +12,9 @@ jobs:
       - name: Check branch
         run: |
           ALLOWED_BRANCH="stage"
-          if [[ $GIT_REFLOG_ACTION == *merge* ]]; then
-          	if [[ $GIT_REFLOG_ACTION == *$ALLOWED_BRANCH* ]]; then
+          	if [[ $GITHUB_HEAD_REF != $ALLOWED_BRANCH ]]; then
           		echo
-          		echo \# STOP THE PRESSES!
-          		echo \#
-          		echo \# You are trying to merge from: \"$ALLOWED_BRANCH\"
-          		echo \# Surely you don\'t mean that?
-          		echo \#
-          		echo \# Run the following command now to discard your working tree changes:
-          		echo \#
-          		echo \# git reset --merge
+          		echo \# You may only merge to the main branch from the \"$ALLOWED_BRANCH\ branch"
           		echo
           		exit 1
           	fi
