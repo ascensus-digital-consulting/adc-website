@@ -1,0 +1,29 @@
+name: Main Branch Protection
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch
+        run: |
+          ALLOWED_BRANCH="stage"
+          if [[ $GIT_REFLOG_ACTION == *merge* ]]; then
+          	if [[ $GIT_REFLOG_ACTION == *$ALLOWED_BRANCH* ]]; then
+          		echo
+          		echo \# STOP THE PRESSES!
+          		echo \#
+          		echo \# You are trying to merge from: \"$ALLOWED_BRANCH\"
+          		echo \# Surely you don\'t mean that?
+          		echo \#
+          		echo \# Run the following command now to discard your working tree changes:
+          		echo \#
+          		echo \# git reset --merge
+          		echo
+          		exit 1
+          	fi
+          fi
