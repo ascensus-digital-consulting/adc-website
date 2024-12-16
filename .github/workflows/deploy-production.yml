@@ -128,5 +128,8 @@ jobs:
     needs: deploy
     
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Smoke test
         run: bash app/test/scripts/smoke-test.sh https://ascensus.digital
