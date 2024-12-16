@@ -18,9 +18,11 @@ jobs:
           echo ALLOWED_BRANCH = $ALLOWED_BRANCH
           
             if [[ $GITHUB_HEAD_REF != $ALLOWED_BRANCH ]]; then
-              echo
               tput setaf 1
               echo Merging from \"$GITHUB_HEAD_REF\" to \"$GITHUB_BASE_REF\" is prohibited.
-              echo
               exit 1
+            else
+              tput setaf 2
+              echo Merging from \"$GITHUB_HEAD_REF\" to \"$GITHUB_BASE_REF\" is allowed.
+              exit 0              
            fi
