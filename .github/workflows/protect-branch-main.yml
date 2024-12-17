@@ -1,4 +1,5 @@
-name: Main Branch Protection
+name: Validate merge constraints for \"$GITHUB_HEAD_REF}\"
+run-name: ${{ github.actor }} is deploying the ADC web application to production
 
 on:
   pull_request:
@@ -13,11 +14,11 @@ jobs:
         run: |
           export TERM=xterm-256color
           ALLOWED_BRANCH="stage"
-          
+
           echo GITHUB_BASE_REF = $GITHUB_BASE_REF
           echo GITHUB_HEAD_REF = $GITHUB_HEAD_REF
           echo ALLOWED_BRANCH = $ALLOWED_BRANCH
-          
+
             if [[ $GITHUB_HEAD_REF != $ALLOWED_BRANCH ]]; then
               tput setaf 1
               echo Merging from \"$GITHUB_HEAD_REF\" to \"$GITHUB_BASE_REF\" is prohibited.
