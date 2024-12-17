@@ -1,5 +1,5 @@
 name: Validate branch merge constraints
-run-name: ${{ github.actor }} is validating merge constraint on branch ${{ github.head_ref }}
+run-name: ${{ github.actor }} is validating merge constraints ${{ github.base_ref }}<--${{ github.head_ref }}
 
 on:
   pull_request:
