@@ -1,4 +1,4 @@
-name: Validate merge constraints for \"$GITHUB_HEAD_REF}\"
+name: Validate merge constraints for \"${{ github.head_ref }}\"
 run-name: ${{ github.actor }} is deploying the ADC web application to production
 
 on:
