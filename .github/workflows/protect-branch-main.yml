@@ -1,5 +1,5 @@
 name: Validate branch merge constraints
-run-name: ${{ github.actor }} is deploying the ADC web application to production
+run-name: ${{ github.actor }} is validating merge constraint on branch ${{ github.head_ref }}
 
 on:
   pull_request:
