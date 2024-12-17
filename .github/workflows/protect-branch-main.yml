@@ -1,4 +1,4 @@
-name: Validate branch merge constraints
+name: Enforce branch merge constraints
 run-name: ${{ github.actor }} is validating merge constraints ${{ github.base_ref }}<--${{ github.head_ref }}
 
 on:
@@ -10,14 +10,11 @@ jobs:
   check-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch
+      - name: Enforce constraints
         run: |
+          # Enforce constraints
           export TERM=xterm-256color
           ALLOWED_BRANCH="stage"
-
-          echo GITHUB_BASE_REF = $GITHUB_BASE_REF
-          echo GITHUB_HEAD_REF = $GITHUB_HEAD_REF
-          echo ALLOWED_BRANCH = $ALLOWED_BRANCH
 
             if [[ $GITHUB_HEAD_REF != $ALLOWED_BRANCH ]]; then
               tput setaf 1
