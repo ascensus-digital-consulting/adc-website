@@ -15,8 +15,10 @@ jobs:
     environment: production
 
     steps:
-      - name: Validate inputs
-        run: echo "Environment ${{ inputs.environment}}"
+      - name: Validate data
+        run: |
+          echo "Environment ${{ inputs.environment}}"
+          echo "Tag: $GITHUB_REF_NAME"
 
       - name: Checkout repository
         uses: actions/checkout@v4
