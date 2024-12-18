@@ -100,4 +100,4 @@ jobs:
           fetch-depth: 0
           
       - name: Tag with version
-        uses: paulhatch/semantic-version@latest
+        uses: paulhatch/semantic-version@v5.4.0
