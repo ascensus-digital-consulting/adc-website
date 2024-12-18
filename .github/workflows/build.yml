@@ -114,7 +114,7 @@ jobs:
           # Named version, will be used as suffix for name version tag
           namespace: adc-web
           # If this is set to true, *every* commit will be treated as a new version.
-          bump_each_commit: false
+          bump_each_commit: true
           # If bump_each_commit is also set to true, setting this value will cause the version to increment only if the pattern specified is matched.
           bump_each_commit_patch_pattern: ''
           # If true, the body of commits will also be searched for major/minor patterns to determine the version type.
