@@ -11,9 +11,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: ${{ inputs.environment}}
+    environment: production
 
     steps:
+      - name: Validate inputs
+        run: echo "Environment ${{ inputs.environment}}"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
