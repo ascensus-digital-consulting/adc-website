@@ -111,4 +111,4 @@ jobs:
           change_path: app/src
 
       - name: View version
-        run: echo ${{steps.increment-version.outputs[*]}}
+        run: echo ${{steps.increment-version.outputs.changed}}
