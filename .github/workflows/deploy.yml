@@ -1,4 +1,5 @@
-name: ADC web application deployment
+name: ADC website deployment
+run-name: Deploy ADC website [@${{ github.actor }}]
 
 on:
   workflow_call:
