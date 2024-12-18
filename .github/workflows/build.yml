@@ -94,10 +94,10 @@ jobs:
     needs: [test-code, test-security]
 
     steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
           
       - name: Tag with version
-        uses: paulhatch/semantic-version@v5.4.0
+        uses: paulhatch/semantic-version@latest
