@@ -2,7 +2,7 @@ name: ADC web application build
 run-name: Build ADC web application [@${{ github.actor }}]
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches:
       - main
 
