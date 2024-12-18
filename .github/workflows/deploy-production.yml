@@ -7,6 +7,6 @@ on:
 jobs:
   deploy-production:
     name: deploy
-    uses: ./deploy.yml
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: 'production'
