@@ -28,7 +28,8 @@ jobs:
           VERSION_FILE=version.html
           VERSION=$GITHUB_REF_NAME
           NEW_CONTENT="<!DOCTYPE html><html lang=\"en\"><head><title>Version</title></head><body>Version: <strong>$VERSION</strong></body></html>"
-          ls
+          echo "$PWD"
+
       - name: Install dependencies
         run: npm install
 
