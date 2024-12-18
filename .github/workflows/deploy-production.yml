@@ -8,5 +8,6 @@ jobs:
   deploy-production:
     name: deploy
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
     with:
       environment: 'production'
