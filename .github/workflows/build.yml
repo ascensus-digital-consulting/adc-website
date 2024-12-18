@@ -100,6 +100,7 @@ jobs:
           fetch-depth: 0
 
       - name: Increment version
+        id: increment-version
         uses: paulhatch/semantic-version@v5.4.0
         with:
           tag_prefix: 'v'
@@ -110,4 +111,4 @@ jobs:
           change_path: app/src
 
       - name: View version
-        run: echo ${{steps.version}}
+        run: echo ${{steps.increment-version.outputs.*}}
