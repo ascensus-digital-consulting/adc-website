@@ -1,4 +1,4 @@
-name: Dev CI/CD Workflow
+name: ADC web application deployment
 run-name: Deploy ADC web application to ${{ inputs.deploy_target }} [@${{ github.actor }}]
 
 on:
