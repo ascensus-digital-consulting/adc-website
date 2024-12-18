@@ -1,5 +1,5 @@
-name: ADC web application deployment
-run-name: Deploy ADC web application to ${{ inputs.deploy_target }} [@${{ github.actor }}]
+name: ADC web application deployment [PRODUCTION]
+run-name: Deploy ADC web application to PRODUCTION [@${{ github.actor }}]
 
 on:
   workflow_dispatch:
