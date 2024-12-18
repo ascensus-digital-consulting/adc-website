@@ -109,6 +109,3 @@ jobs:
           version_format: '${major}.${minor}.${patch}+${increment}'
           namespace: adc-web
           change_path: app/src
-
-      - name: View version
-        run: echo ${{steps.increment-version.outputs.changed}}
