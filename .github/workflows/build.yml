@@ -89,6 +89,7 @@ jobs:
   tag-with-version:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: [test-code, test-security]
 
     steps:
       - name: Tag with version
