@@ -86,6 +86,11 @@ jobs:
         with:
           category: '/language:${{matrix.language}}'
 
+  test-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
       - name: Tag with version
         uses: paulhatch/semantic-version@v5.4.0
         with:
