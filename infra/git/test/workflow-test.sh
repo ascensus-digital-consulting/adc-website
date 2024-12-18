@@ -4,7 +4,7 @@ clear
 WORKFLOW_TEST_FILE=workflow-test.html
 ID=$(date +%s)
 TEST_BRANCH_NAME=test-branch-$ID
-NEW_CONTENT="<html>Test id: <strong>$ID</strong></html>"
+NEW_CONTENT="<!DOCTYPE html><html lang=\"en\"><head><title>Workflow Test File</title></head><body>Test id:<strong>$ID</strong></body></html>"
 
 git checkout main
 git pull origin main
