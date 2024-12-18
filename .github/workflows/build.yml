@@ -1,4 +1,4 @@
-name: ADC web application build
+name: ADC website build
 run-name: Build ADC web application [@${{ github.actor }}]
 on:
   workflow_dispatch:
