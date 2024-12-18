@@ -23,6 +23,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Add version file
+        run: |
+          VERSION_FILE=version.html
+          VERSION=$GITHUB_REF_NAME
+          NEW_CONTENT="<!DOCTYPE html><html lang=\"en\"><head><title>Version</title></head><body>Version: <strong>$VERSION</strong></body></html>"
+      #          echo "$NEW_CONTENT" > $VERSION_FILE
+          ls
       - name: Install dependencies
         run: npm install
 
