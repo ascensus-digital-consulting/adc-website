@@ -26,7 +26,7 @@ jobs:
       - name: Add version file
         run: |
           VERSION_FILE_NAME=version.html
-          VERSION_FILE_PATH=${{ github.workspace }}/adc-website/app/src/$VERSION_FILE_NAME
+          VERSION_FILE_PATH=${{ github.workspace }}/app/src/$VERSION_FILE_NAME
           VERSION=$GITHUB_REF_NAME
           NEW_CONTENT="<!DOCTYPE html><html lang=\"en\"><head><title>Version</title></head><body>Version: <strong>$VERSION</strong></body></html>"
 
