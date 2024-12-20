@@ -46,9 +46,9 @@ jobs:
         uses: reggionick/s3-deploy@v4
         with:
           folder: app/src
-          bucket: $S3_BUCKET
-          bucket-region: $S3_BUCKET_REGION
-          dist-id: $CLOUDFRONT_DISTRIBUTION_ID
+          bucket: ${{ vars.S3_BUCKET }}
+          bucket-region: ${{ vars.S3_BUCKET_REGION }}
+          dist-id: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
           invalidation: /
           delete-removed: true
           no-cache: true
