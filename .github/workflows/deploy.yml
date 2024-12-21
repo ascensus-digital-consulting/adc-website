@@ -27,7 +27,9 @@ jobs:
           VERSION_FILE_NAME=version.json
           VERSION_FILE_PATH=${{ github.workspace }}/app/src/$VERSION_FILE_NAME
           VERSION=$GITHUB_REF_NAME
-          NEW_CONTENT="{\n\t\"version\": \"$VERSION\"\n}"
+          NEW_CONTENT="{
+                          \"version\": \"$VERSION\"
+                        }"
 
           echo "$NEW_CONTENT" > $VERSION_FILE_PATH
 
