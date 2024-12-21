@@ -45,7 +45,6 @@ jobs:
       - name: Sts GetCallerIdentity
         run: |
           aws sts get-caller-identity
-          aws-region: us-west-1
 
       - name: Deploy application
         uses: reggionick/s3-deploy@v4
