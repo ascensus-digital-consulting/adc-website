@@ -24,10 +24,10 @@ jobs:
 
       - name: Add version file
         run: |
-          VERSION_FILE_NAME=version.html
+          VERSION_FILE_NAME=version.json
           VERSION_FILE_PATH=${{ github.workspace }}/app/src/$VERSION_FILE_NAME
           VERSION=$GITHUB_REF_NAME
-          NEW_CONTENT="<!DOCTYPE html><html lang=\"en\"><head><title>Version</title></head><body>Version: <strong>$VERSION</strong></body></html>"
+          NEW_CONTENT="{\n\t\"version\": \"$VERSION\"\n}"
 
           echo "$NEW_CONTENT" > $VERSION_FILE_PATH
 
