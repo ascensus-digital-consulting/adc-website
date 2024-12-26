@@ -15,7 +15,7 @@ class InfraStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       enforceSSL: true,
       bucketName: `example-bucket-adc-${new Date().getTime()}`,
-      versioned: false,
+      versioned: true,
       // encryptionKey: new kms.Key(this, 's3BucketKMSKey'),
     });
 
