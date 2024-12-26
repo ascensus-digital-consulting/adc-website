@@ -32,9 +32,7 @@ jobs:
           echo "$NEW_CONTENT" > $VERSION_FILE_PATH
 
       - name: Install dependencies
-        run: |
-          cd ./web
-          npm install
+        run: npm install
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
