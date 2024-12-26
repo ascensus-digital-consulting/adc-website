@@ -13,6 +13,7 @@ class InfraStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       autoDeleteObjects: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      enforceSSL: true,
       bucketName: `example-bucket-adc-${new Date().getTime()}`,
       // encryptionKey: new kms.Key(this, 's3BucketKMSKey'),
     });

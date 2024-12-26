@@ -4,7 +4,7 @@ const cdk = require('aws-cdk-lib');
 const { InfraStack } = require('../lib/infra-stack');
 
 const app = new cdk.App();
-new InfraStack(app, 'InfraStack', {
+const stack = new InfraStack(app, 'InfraStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
