@@ -41,15 +41,10 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: us-west-1
 
-      # Hello from AWS: WhoAmI
-      - name: Sts GetCallerIdentity
-        run: |
-          aws sts get-caller-identity
-
       - name: Deploy application
         uses: reggionick/s3-deploy@v4
         with:
-          folder: app/src
+          folder: web/src
           bucket: ${{ vars.S3_BUCKET }}
           bucket-region: ${{ vars.S3_BUCKET_REGION }}
           dist-id: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
