@@ -41,6 +41,13 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: us-west-1
 
+      - name: Log environmental variables
+        run: |
+          echo "vars.S3_BUCKET : ${{ vars.S3_BUCKET }}"
+          echo "vars.S3_BUCKET_REGION : ${{ vars.S3_BUCKET_REGION }}"
+          echo "vars.CLOUDFRONT_DISTRIBUTION_ID : ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}"
+          echo "vars.WEB_DOMAIN : ${{ vars.WEB_DOMAIN }}"
+
       - name: Deploy application
         uses: reggionick/s3-deploy@v4
         with:
