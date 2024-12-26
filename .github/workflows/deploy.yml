@@ -57,7 +57,6 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: production
     needs: deploy
 
     steps:
@@ -65,4 +64,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Smoke test
-        run: bash web/test/scripts/smoke-test.sh https://ascensus.digital
+        run: bash web/test/scripts/smoke-test.sh https://${{ vars.WEB_DOMAIN }}
