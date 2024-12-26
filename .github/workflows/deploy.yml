@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: production
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout repository
@@ -64,6 +64,7 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: ${{ inputs.environment }}
     needs: deploy
 
     steps:
