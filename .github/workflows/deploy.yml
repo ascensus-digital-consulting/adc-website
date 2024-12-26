@@ -31,7 +31,9 @@ jobs:
           npm install -g aws-cdk
   
       - name: Create example bucket
-        run: cdk deploy
+        run: |
+          ls
+          cdk deploy
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
