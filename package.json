@@ -4,6 +4,6 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
-    "test": "jest --coverage --passWithNoTests --config=jest.config.json"
+    "test": "jest --coverage --passWithNoTests"
   }
 }
