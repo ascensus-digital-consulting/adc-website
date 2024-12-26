@@ -11,7 +11,3 @@ jobs:
     secrets: inherit
     with:
       environment: 'production-green'
-      cloudfront-distribution-id: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-      s3-bucket: ${{ vars.S3_BUCKET }}
-      s3-bucket-region: ${{ vars.S3_BUCKET_REGION }}
-      web-domain: ${{ WEB_DOMAIN }}
