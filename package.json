@@ -5,5 +5,15 @@
   },
   "scripts": {
     "test": "jest --coverage --passWithNoTests"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcov"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/infra/"
+    ]
   }
 }
