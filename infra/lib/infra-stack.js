@@ -1,39 +1,69 @@
+// Import the AWS CDK libraries
 const cdk = require('aws-cdk-lib');
-const iam = require('aws-cdk-lib/aws-iam');
-const kms = require('aws-cdk-lib/aws-kms');
+const { Stack } = cdk;
 const s3 = require('aws-cdk-lib/aws-s3');
 const cloudfront = require('aws-cdk-lib/aws-cloudfront');
-const { Construct } = require('constructs');
+const origins = require('aws-cdk-lib/aws-cloudfront-origins');
+const iam = require('aws-cdk-lib/aws-iam');
 
-class InfraStack extends cdk.Stack {
+class InfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const s3Bucket = new s3.Bucket(this, 'exampleBucket', {
-      objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      autoDeleteObjects: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      enforceSSL: true,
-      bucketName: `example-bucket-adc-${new Date().getTime()}`,
-      versioned: true,
-      // encryptionKey: new kms.Key(this, 's3BucketKMSKey'),
+    // Create the S3 bucket with all public access blocked
+    const bucket = new s3.Bucket(this, 'MyBucket', {
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block all public access
+      removalPolicy: cdk.RemovalPolicy.DESTROY, // Change to RETAIN for production
+      autoDeleteObjects: true, // Deletes objects when the bucket is deleted (useful for development)
     });
 
-    s3Bucket.grantRead(new iam.AccountRootPrincipal());
+    // Create an Origin Access Control (OAC) for CloudFront to securely access the S3 bucket
+    const oac = new cloudfront.CfnOriginAccessControl(this, 'MyOAC', {
+      originAccessControlConfig: {
+        name: 'MyOAC',
+        originAccessControlOriginType: 's3',
+        signingBehavior: 'always',
+        signingProtocol: 'sigv4',
+      },
+    });
 
-    const cloudfrontDist = new cloudfront.Distribution(
+    // Create a CloudFront distribution
+    const distribution = new cloudfront.Distribution(
       this,
-      'exampleDistribution',
+      'MyCloudFrontDistribution',
       {
         defaultBehavior: {
-          origin: new cloudfront.Origins.S3Origin(s3Bucket),
+          origin: new origins.S3Origin(bucket, {
+            originAccessControlId: oac.attrId, // Attach the OAC to the S3 origin
+          }),
+          viewerProtocolPolicy:
+            cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS, // Enforce HTTPS
         },
-        defaultRootObject: 'index.html',
-        enableLogging: true,
-        minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       }
     );
+
+    // Grant the CloudFront OAC permissions to read from the S3 bucket
+    bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: [`${bucket.bucketArn}/*`],
+        principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
+        conditions: {
+          StringEquals: {
+            'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
+          },
+        },
+      })
+    );
+
+    // Output the S3 bucket name and CloudFront distribution domain name
+    new cdk.CfnOutput(this, 'BucketName', {
+      value: bucket.bucketName,
+    });
+
+    new cdk.CfnOutput(this, 'CloudFrontDomainName', {
+      value: distribution.domainName,
+    });
   }
 }
 
