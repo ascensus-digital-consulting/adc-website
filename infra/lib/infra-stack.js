@@ -34,7 +34,7 @@ class InfraStack extends Stack {
       'MyCloudFrontDistribution',
       {
         defaultBehavior: {
-          origin: new origins.S3Origin(bucket, {
+          origin: new origins.S3BucketOrigin(bucket, {
             originAccessControlId: oac.attrId, // Attach the OAC to the S3 origin
           }),
           viewerProtocolPolicy:
