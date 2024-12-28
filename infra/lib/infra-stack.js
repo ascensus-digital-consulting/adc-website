@@ -2,6 +2,7 @@ const cdk = require('aws-cdk-lib');
 const iam = require('aws-cdk-lib/aws-iam');
 const kms = require('aws-cdk-lib/aws-kms');
 const s3 = require('aws-cdk-lib/aws-s3');
+const cloudfront = require('aws-cdk-lib/aws-cloudfront');
 const { Construct } = require('constructs');
 
 class InfraStack extends cdk.Stack {
@@ -20,6 +21,19 @@ class InfraStack extends cdk.Stack {
     });
 
     s3Bucket.grantRead(new iam.AccountRootPrincipal());
+
+    const cloudfrontDist = new cloudfront.Distribution(
+      this,
+      'exampleDistribution',
+      {
+        defaultBehavior: {
+          origin: new cloudfront.Origins.S3Origin(s3Bucket),
+        },
+        defaultRootObject: 'index.html',
+        enableLogging: true,
+        minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+      }
+    );
   }
 }
 
