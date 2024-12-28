@@ -12,7 +12,6 @@ const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
 class InfraStack extends Stack {
-class InfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
