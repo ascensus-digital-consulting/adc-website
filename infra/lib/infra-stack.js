@@ -15,6 +15,7 @@ class InfraStack extends Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block all public access
       removalPolicy: cdk.RemovalPolicy.DESTROY, // Change to RETAIN for production
       autoDeleteObjects: true, // Deletes objects when the bucket is deleted (useful for development)
+      enforceSSL: true,
     });
 
     // Create an Origin Access Control (OAC) for CloudFront to securely access the S3 bucket
