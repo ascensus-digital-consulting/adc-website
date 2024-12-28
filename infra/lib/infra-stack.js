@@ -1,4 +1,5 @@
 // Import the AWS CDK libraries
+// Import the AWS CDK libraries
 const cdk = require('aws-cdk-lib');
 const { Stack } = cdk;
 const s3 = require('aws-cdk-lib/aws-s3');
@@ -10,6 +11,7 @@ const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
+class InfraStack extends Stack {
 class InfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
