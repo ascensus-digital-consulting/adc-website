@@ -2,6 +2,7 @@
 const cdk = require('aws-cdk-lib');
 const { Stack } = cdk;
 const s3 = require('aws-cdk-lib/aws-s3');
+const s3deploy = require('@aws-cdk/aws-s3-deployment');
 const cloudfront = require('aws-cdk-lib/aws-cloudfront');
 const origins = require('aws-cdk-lib/aws-cloudfront-origins');
 const iam = require('aws-cdk-lib/aws-iam');
@@ -34,7 +35,7 @@ class InfraStack extends Stack {
       'MyCloudFrontDistribution',
       {
         defaultBehavior: {
-          origin: new origins.S3Origin(bucket, {
+          origin: new origins.S3BucketOrigin(bucket, {
             originAccessControlId: oac.attrId, // Attach the OAC to the S3 origin
           }),
           viewerProtocolPolicy:
@@ -56,6 +57,11 @@ class InfraStack extends Stack {
         },
       })
     );
+
+    const deployment = new s3deploy.BucketDeployment(this, 'DeployFiles', {
+      sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
+      destinationBucket: bucket,
+    });
 
     // Output the S3 bucket name and CloudFront distribution domain name
     new cdk.CfnOutput(this, 'BucketName', {
