@@ -9,6 +9,11 @@ class InfraStack extends cdk.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
+    const kmsKey = kms.Key(this, 'kmsKey', {
+      alias: 'adc-website-kms-key',
+      enableKeyRotation: true,
+    });
+
     const s3Bucket = new s3.Bucket(this, 'exampleBucket', {
       objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -17,6 +22,8 @@ class InfraStack extends cdk.Stack {
       enforceSSL: true,
       bucketName: `example-bucket-adc-${new Date().getTime()}`,
       versioned: true,
+      encryption: s3.BucketEncryption.KMS,
+      encryptionKey: kmsKey,
       // encryptionKey: new kms.Key(this, 's3BucketKMSKey'),
     });
 
@@ -27,7 +34,7 @@ class InfraStack extends cdk.Stack {
       'exampleDistribution',
       {
         defaultBehavior: {
-          origin: new cloudfront.Origins.S3Origin(s3Bucket),
+          origin: new cloudfront.Origins.S3BucketOrigin(s3Bucket),
         },
         defaultRootObject: 'index.html',
         enableLogging: true,
