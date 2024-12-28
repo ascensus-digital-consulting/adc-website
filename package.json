@@ -5,5 +5,8 @@
   },
   "scripts": {
     "test": "jest --coverage --passWithNoTests"
+  },
+  "dependencies": {
+    "cdk": "^2.173.2"
   }
 }
