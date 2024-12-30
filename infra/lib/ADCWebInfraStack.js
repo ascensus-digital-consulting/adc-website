@@ -8,21 +8,26 @@ const iam = require('aws-cdk-lib/aws-iam');
 const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
+const { ADCUtils } = require('./ADCUtils');
 
-class InfraStack extends Stack {
+class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const host = this.node.tryGetContext('host');
-    const bucketName = 'adc-s3-web';
-    const distributionName = 'adc-cloudfront-web';
-    const deploymentName = 'adc-deployment-web';
-    const aliasRecordName = 'adc-alias-record';
+    const host = props.env.host;
+    const envId = host ? ADCUtils.capitalize(host) : 'Prod';
+    const bucketName = `ADCWeb${envId}Bucket`;
+    const distributionName = `ADCWeb${envId}Distribution`;
+    const deploymentName = `ADCWeb${envId}Deployment`;
+    const aliasRecordName = `ADCWeb${envId}ARecord`;
+    const cachePolicyName = `ADCWeb${envId}CachePolicy`;
     const domains = this.#defineDomains(host);
 
     const bucket = this.#createBucket(bucketName);
+    const cachePolicy = this.#createCachePolicy(cachePolicyName);
     const distribution = this.#createDistribution(
       distributionName,
+      cachePolicy,
       domains,
       bucket
     );
@@ -50,17 +55,23 @@ class InfraStack extends Stack {
     return bucket;
   }
 
-  #createDistribution(distributionName, domains, bucket) {
+  #createCachePolicy(cachePolicyName) {
+    const cachePolicy = new cloudfront.CachePolicy(this, cachePolicyName, {
+      defaultTtl: cdk.Duration.minutes(30), // Set the default TTL to 30 minutes
+      minTtl: cdk.Duration.minutes(30), // Set the minimum TTL to 30 minutes
+      maxTtl: cdk.Duration.minutes(60), // Set the maximum TTL to 60 minutes
+    });
+
+    return cachePolicy;
+  }
+
+  #createDistribution(distributionName, cachePolicy, domains, bucket) {
     const defaultBehavior = {
       origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS, // Enforce HTTPS
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD, // Allow only GET and HEAD methods
       cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD, // Cache GET and HEAD methods
-      cachePolicy: new cloudfront.CachePolicy(this, 'ADCCachePolicyWeb', {
-        defaultTtl: cdk.Duration.minutes(30), // Set the default TTL to 30 minutes
-        minTtl: cdk.Duration.minutes(30), // Set the minimum TTL to 30 minutes
-        maxTtl: cdk.Duration.minutes(60), // Set the maximum TTL to 60 minutes
-      }),
+      cachePolicy: cachePolicy,
     };
     const props = {
       defaultBehavior: defaultBehavior,
@@ -143,4 +154,4 @@ class InfraStack extends Stack {
   }
 }
 
-module.exports = { InfraStack };
+module.exports = { ADCWebInfraStack };
