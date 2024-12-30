@@ -48,9 +48,13 @@ jobs:
           aws-region: us-west-1
 
       - name: Create example bucket
+        id: create-example-bucket
         run: |
           cd ./infra
-          cdk deploy --require-approval never${{ inputs.deploy-args }}
+          cdk deploy --require-approval never${{ inputs.deploy-args }} >> "$GITHUB_OUTPUT"
+
+      - name: Read CDK output
+        run: echo "${{ steps.create-example-bucket.outputs }}"
 
   # # deploy:
   # #   runs-on: ubuntu-latest
