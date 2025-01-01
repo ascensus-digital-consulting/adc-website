@@ -3,9 +3,6 @@
 const cdk = require('aws-cdk-lib');
 const { ADCWebInfraStack } = require('../lib/ADCWebInfraStack');
 const { ADCUtils } = require('../lib/ADCUtils');
-const {
-  UnauthenticatedAction,
-} = require('aws-cdk-lib/aws-elasticloadbalancingv2');
 
 /*** Setup ***/
 
@@ -17,7 +14,7 @@ const stackName = defineStackName();
 const props = defineStackProps(host, stackName);
 
 /*** Create stack ***/
-const stack = new ADCWebInfraStack(app, stackName, props);
+const stack = new ADCWebInfraStack(app, context, props);
 
 /*** Supporting functions ***/
 function defineContext(app) {

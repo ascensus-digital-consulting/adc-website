@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: ${{ inputs.environment }}
-    needs: deploy
+    needs: deploy-infra
 
     steps:
       - name: Checkout repository
