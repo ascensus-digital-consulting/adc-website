@@ -21,7 +21,7 @@ on:
         type: string
       domains:
         required: true
-        type: array
+        type: string
       environment:
         required: true
         type: string
