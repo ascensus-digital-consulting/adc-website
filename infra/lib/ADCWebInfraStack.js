@@ -8,19 +8,20 @@ const iam = require('aws-cdk-lib/aws-iam');
 const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
-const { ADCUtils } = require('./ADCUtils');
+const { ADCInfraNames } = require('./ADCInfraNames');
 
 class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
     const host = props.env.host;
-    const envId = host ? ADCUtils.capitalize(host) : 'Prod';
-    const bucketName = `ADCWeb${envId}Bucket`;
-    const distributionName = `ADCWeb${envId}Distribution`;
-    const deploymentName = `ADCWeb${envId}Deployment`;
-    const aliasRecordName = `ADCWeb${envId}ARecord`;
-    const cachePolicyName = `ADCWeb${envId}CachePolicy`;
+    const names = new ADCInfraNames(host);
+
+    const bucketName = names.bucketName;
+    const distributionName = names.distributionName;
+    const deploymentName = names.deploymentName;
+    const aliasRecordName = names.aliasRecordName;
+    const cachePolicyName = names.cachePolicyName;
     const domains = this.#defineDomains(host);
 
     const bucket = this.#createBucket(bucketName);
@@ -88,6 +89,7 @@ class ADCWebInfraStack extends Stack {
       distributionName,
       props
     );
+
     // Grant the CloudFront OAC permissions to read from the S3 bucket
     bucket.addToResourcePolicy(
       new iam.PolicyStatement({
