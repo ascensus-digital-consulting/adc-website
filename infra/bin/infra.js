@@ -9,12 +9,10 @@ const { ADCUtils } = require('../lib/ADCUtils');
 const app = new cdk.App();
 const context = defineContext(app);
 
-const host = defineHost();
-const stackName = defineStackName();
-const props = defineStackProps(host, stackName);
+const props = defineStackProps(context, context);
 
 /*** Create stack ***/
-const stack = new ADCWebInfraStack(app, context, props);
+const stack = new ADCWebInfraStack(app, context.stackName, props);
 
 /*** Supporting functions ***/
 function defineContext(app) {
@@ -45,27 +43,17 @@ function validateContext(context) {
     throw Error(
       `The following context values are undefined: ${undefValues.join(
         ', '
-      )}. Please specify context values using the --context (or -c) switch when using cdk deploy.}`
+      )}. Please specify context values using the --context (or -c) switch when using cdk deploy.`
     );
   }
 }
 
-function defineStackName() {
-  const stackName = app.node.tryGetContext('stackname');
-  if (!stackName) {
-    throw Error(
-      'Stack name is not defined. Please define it with --context (or -c) stackname=your-stack-name'
-    );
-  }
-  return stackName;
-}
-
-function defineStackProps(host, stackName) {
+function defineStackProps(context, stackName) {
   const props = {
     env: {
       account: process.env.CDK_DEFAULT_ACCOUNT,
       region: process.env.CDK_DEFAULT_REGION,
-      host: host,
+      context: context,
       stackName: stackName,
     },
   };
