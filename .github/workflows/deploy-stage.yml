@@ -10,5 +10,12 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      environment: 'production-green'
-      deploy-args: ' -c host=stage'
+      aliasRecordName: ADCWebStageARecord
+      bucketName: ADCWebStageBucket
+      cachePolicyName: ADCWebStageCachePolicy
+      deploymentName: ADCWebStageDeployment
+      distributionName: ADCWebStageDistribution
+      domains: stage.ascensus.digital
+      environment: production-green
+      host: stage
+      stackName: ADCWebStageStack
