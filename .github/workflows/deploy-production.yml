@@ -10,4 +10,11 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      environment: 'production-blue'
+      aliasRecordName: ADCWebProdARecord
+      bucketName: ADCWebProdBucket
+      cachePolicyName: ADCWebProdCachePolicy
+      deploymentName: ADCWebProdDeployment
+      distributionName: ADCWebProdDistribution
+      domains: ascensus.digital,www.ascensus.digital
+      environment: production-blue
+      stackName: ADCWebProdStack

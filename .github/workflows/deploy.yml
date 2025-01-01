@@ -4,11 +4,32 @@ run-name: Deploy ADC website [@${{ github.actor }}]
 on:
   workflow_call:
     inputs:
+      aliasRecordName:
+        required: true
+        type: string
+      bucketName:
+        required: true
+        type: string
+      cachePolicyName:
+        required: true
+        type: string
+      deploymentName:
+        required: true
+        type: string
+      distributionName:
+        required: true
+        type: string
+      domains:
+        required: true
+        type: array
       environment:
         required: true
         type: string
-      deploy-args:
+      host:
         required: false
+        type: string
+      stackName:
+        required: true
         type: string
 
 permissions:
@@ -25,7 +46,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add version file
+      - name: Add version file to deployment package
         run: |
           VERSION_FILE_NAME=version.json
           VERSION_FILE_PATH=${{ github.workspace }}/web/src/$VERSION_FILE_NAME
@@ -47,10 +68,19 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: us-west-1
 
-      - name: Create example bucket
+      - name: Create stack
         run: |
           cd ./infra
-          cdk deploy --require-approval never${{ inputs.deploy-args }}
+          cdk deploy --require-approval never \
+            -c aliasRecordName=${{ inputs.aliasRecordName }} \
+            -c bucketName=${{ inputs.bucketName }} \
+            -c cachePolicyName=${{ inputs.cachePolicyName }} \
+            -c deploymentName=${{ inputs.deploymentName }} \
+            -c distributionName=${{ inputs.distributionName }} \
+            -c domains=${{ inputs.domains }} \
+            -c environment=${{ inputs.environment }} \
+            -c host=${{ inputs.host }} \
+            -c stackName=${{ inputs.stackName }} \
 
   # # deploy:
   # #   runs-on: ubuntu-latest
