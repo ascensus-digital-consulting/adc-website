@@ -4,7 +4,6 @@ const s3 = require('aws-cdk-lib/aws-s3');
 const s3deploy = require('aws-cdk-lib/aws-s3-deployment');
 const cloudfront = require('aws-cdk-lib/aws-cloudfront');
 const origins = require('aws-cdk-lib/aws-cloudfront-origins');
-//const iam = require('aws-cdk-lib/aws-iam');
 const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
@@ -77,20 +76,6 @@ class ADCWebInfraStack extends Stack {
       distributionName,
       props
     );
-
-    // // Grant the CloudFront OAC permissions to read from the S3 bucket
-    // bucket.addToResourcePolicy(
-    //   new iam.PolicyStatement({
-    //     actions: ['s3:GetObject'],
-    //     resources: [`${bucket.bucketArn}/*`],
-    //     principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
-    //     conditions: {
-    //       StringEquals: {
-    //         'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
-    //       },
-    //     },
-    //   })
-    // );
 
     return distribution;
   }
