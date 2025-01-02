@@ -22,14 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add version file to deployment package
+      - name: Add metadata file to deployment package
         run: |
-          VERSION_FILE_NAME=version.json
-          VERSION_FILE_PATH=${{ github.workspace }}/web/src/$VERSION_FILE_NAME
-          VERSION=$GITHUB_REF_NAME
-          NEW_CONTENT=`{\n\t\"version\": \"$VERSION\"\n\t\"released-at\": \"$(date +%d-%m-%Y" "%H:%M:%S)\"\n}`
-
-          echo "$NEW_CONTENT" > $VERSION_FILE_PATH
+          METADATA_FILE_NAME=metadata.json
+          METADATA_FILE_PATH=${{ github.workspace }}/web/src/$VERSION_FILE_NAME
+          METADATA=$GITHUB_REF_NAME
+          NEW_CONTENT="{\n\t\"version\":\"$VERSION\",\n\t\"released-at\":\"$(date +%d-%m-%Y" "%H:%M:%S)\"\n}"
+          echo "$NEW_CONTENT" > $METADATA_FILE_PATH
 
       - name: Install dependencies
         run: |
