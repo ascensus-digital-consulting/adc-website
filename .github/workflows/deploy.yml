@@ -57,47 +57,6 @@ jobs:
             -c host=${{ vars.HOST }} \
             -c stackName=${{ vars.STACK_NAME }} \
 
-  # # deploy:
-  # #   runs-on: ubuntu-latest
-  # #   timeout-minutes: 10
-  # #   environment: ${{ inputs.environment }}
-
-  # #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Add version file
-  #       run: |
-  #         VERSION_FILE_NAME=version.json
-  #         VERSION_FILE_PATH=${{ github.workspace }}/web/src/$VERSION_FILE_NAME
-  #         VERSION=$GITHUB_REF_NAME
-  #         NEW_CONTENT="{\"version\": \"$VERSION\"}"
-
-  #         echo "$NEW_CONTENT" > $VERSION_FILE_PATH
-
-  #     - name: Install dependencies
-  #       run: npm install
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: arn:aws:iam::030460844096:role/GitHubAction-AssumeRoleWithAction
-  #         role-session-name: GitHub_to_AWS_via_FederatedOIDC
-  #         aws-region: us-west-1
-
-  #     - name: Deploy application
-  #       uses: reggionick/s3-deploy@v4
-  #       with:
-  #         folder: web/src
-  #         bucket: ${{ vars.S3_BUCKET }}
-  #         bucket-region: ${{ vars.S3_BUCKET_REGION }}
-  #         dist-id: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-  #         invalidation: /
-  #         delete-removed: true
-  #         no-cache: true
-  #         private: true
-  #         files-to-include: '{.*/**,**}'
-
   smoke-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

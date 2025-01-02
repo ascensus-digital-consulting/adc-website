@@ -3,6 +3,7 @@ run-name: Deploy ADC website to DEV [@${{ github.actor }}]
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   deploy-production:

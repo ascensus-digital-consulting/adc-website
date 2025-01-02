@@ -7,7 +7,12 @@ on:
       - main
 
 jobs:
-  test-code:
+  ui-tests:
+    name: Test website
+    uses: ./.github/workflows/deploy-dev.yml
+    secrets: inherit
+
+  static-analysis:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -38,18 +43,13 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  test-security:
+  security-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     permissions:
-      # required for all workflows
       security-events: write
-
-      # required to fetch internal or private CodeQL packs
       packages: read
-
-      # only required for workflows in private repositories
       actions: read
       contents: read
 
@@ -66,7 +66,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -91,7 +90,7 @@ jobs:
   tag-with-version:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [test-code, test-security]
+    needs: [static-analysis, security-tests, ui-tests]
 
     steps:
       - name: Checkout repository
@@ -108,4 +107,4 @@ jobs:
           minor_pattern: '(#MINOR)'
           version_format: '${major}.${minor}.${patch}+${increment}'
           namespace: adc-web
-          change_path: app/src
+          change_path: web/src infra/bin infra/lib
