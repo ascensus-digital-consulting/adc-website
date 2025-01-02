@@ -23,11 +23,9 @@ function defineContext(app) {
     deploymentName: app.node.tryGetContext('deploymentName'),
     distributionName: app.node.tryGetContext('distributionName'),
     domains: app.node.tryGetContext('domains'),
-    environment: app.node.tryGetContext('environment'),
     host: app.node.tryGetContext('host') || '',
     stackName: app.node.tryGetContext('stackName'),
   };
-
   validateContext(context);
   return context;
 }
