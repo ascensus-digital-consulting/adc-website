@@ -4,25 +4,21 @@ const s3 = require('aws-cdk-lib/aws-s3');
 const s3deploy = require('aws-cdk-lib/aws-s3-deployment');
 const cloudfront = require('aws-cdk-lib/aws-cloudfront');
 const origins = require('aws-cdk-lib/aws-cloudfront-origins');
-const iam = require('aws-cdk-lib/aws-iam');
 const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
-const { ADCInfraNames } = require('./ADCInfraNames');
 
 class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    const host = props.env.host;
-    const names = new ADCInfraNames(host);
-
-    const bucketName = names.bucketName;
-    const distributionName = names.distributionName;
-    const deploymentName = names.deploymentName;
-    const aliasRecordName = names.aliasRecordName;
-    const cachePolicyName = names.cachePolicyName;
-    const domains = this.#defineDomains(host);
+    const host = props.env.context.host;
+    const bucketName = props.env.context.bucketName;
+    const distributionName = props.env.context.distributionName;
+    const deploymentName = props.env.context.deploymentName;
+    const aliasRecordName = props.env.context.aliasRecordName;
+    const cachePolicyName = props.env.context.cachePolicyName;
+    const domains = props.env.context.domains;
 
     const bucket = this.#createBucket(bucketName);
     const cachePolicy = this.#createCachePolicy(cachePolicyName);
@@ -32,17 +28,8 @@ class ADCWebInfraStack extends Stack {
       domains,
       bucket
     );
-    this.#createDeployment(deploymentName, bucket);
+    this.#createDeployment(deploymentName, bucket, distribution);
     this.#createAliasRecord(aliasRecordName, host, distribution);
-
-    // Output the S3 bucket name and CloudFront distribution domain name
-    new cdk.CfnOutput(this, 'BucketName', {
-      value: bucket.bucketName,
-    });
-
-    new cdk.CfnOutput(this, 'CloudFrontDomainName', {
-      value: distribution.domainName,
-    });
   }
 
   #createBucket(bucketName) {
@@ -76,7 +63,7 @@ class ADCWebInfraStack extends Stack {
     };
     const props = {
       defaultBehavior: defaultBehavior,
-      domainNames: domains, // Add your domain names here
+      domainNames: domains.split(','), // Add your domain names here
       defaultRootObject: 'index.html', // Set the default root object to index.html
       certificate: Certificate.fromCertificateArn(
         this,
@@ -90,27 +77,15 @@ class ADCWebInfraStack extends Stack {
       props
     );
 
-    // Grant the CloudFront OAC permissions to read from the S3 bucket
-    bucket.addToResourcePolicy(
-      new iam.PolicyStatement({
-        actions: ['s3:GetObject'],
-        resources: [`${bucket.bucketArn}/*`],
-        principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
-        conditions: {
-          StringEquals: {
-            'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
-          },
-        },
-      })
-    );
-
     return distribution;
   }
 
-  #createDeployment(deploymenName, bucket) {
+  #createDeployment(deploymenName, bucket, distribution) {
     const deployment = new s3deploy.BucketDeployment(this, deploymenName, {
       sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
       destinationBucket: bucket,
+      distribution: distribution,
+      distributionPaths: ['/*'],
     });
 
     return deployment;
@@ -134,25 +109,12 @@ class ADCWebInfraStack extends Stack {
       ),
       zone: zone,
       deleteExisting: true,
+      recordName: host,
     };
-
-    if (host) {
-      props.recordName = host;
-    }
 
     const aliasRecord = new route53.ARecord(this, aliasRecordName, props);
 
     return aliasRecord;
-  }
-
-  #defineDomains(host) {
-    const domains = [];
-    if (!host) {
-      domains.push('www.ascensus.digital', 'ascensus.digital');
-    } else {
-      domains.push(`${host}.ascensus.digital`);
-    }
-    return domains;
   }
 }
 
