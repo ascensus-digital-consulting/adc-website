@@ -68,4 +68,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Smoke test
-        run: bash web/test/scripts/smoke-test.sh https://${{ vars.WEB_DOMAIN }}
+        run: bash web/test/scripts/smoke-test.sh https://${{ vars.PRIMARY_DOMAIN }}
