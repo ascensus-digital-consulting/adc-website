@@ -10,12 +10,4 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      aliasRecordName: ADCWebStageARecord
-      bucketName: ADCWebStageBucket
-      cachePolicyName: ADCWebStageCachePolicy
-      deploymentName: ADCWebStageDeployment
-      distributionName: ADCWebStageDistribution
-      domains: stage.ascensus.digital
-      environment: production-green
-      host: stage
-      stackName: ADCWebStageStack
+      environment: STAGE

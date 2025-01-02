@@ -4,31 +4,7 @@ run-name: Deploy ADC website [@${{ github.actor }}]
 on:
   workflow_call:
     inputs:
-      aliasRecordName:
-        required: true
-        type: string
-      bucketName:
-        required: true
-        type: string
-      cachePolicyName:
-        required: true
-        type: string
-      deploymentName:
-        required: true
-        type: string
-      distributionName:
-        required: true
-        type: string
-      domains:
-        required: true
-        type: string
       environment:
-        required: true
-        type: string
-      host:
-        required: false
-        type: string
-      stackName:
         required: true
         type: string
 
@@ -72,15 +48,14 @@ jobs:
         run: |
           cd ./infra
           cdk deploy --require-approval never \
-            -c aliasRecordName=${{ inputs.aliasRecordName }} \
-            -c bucketName=${{ inputs.bucketName }} \
-            -c cachePolicyName=${{ inputs.cachePolicyName }} \
-            -c deploymentName=${{ inputs.deploymentName }} \
-            -c distributionName=${{ inputs.distributionName }} \
-            -c domains=${{ inputs.domains }} \
-            -c environment=${{ inputs.environment }} \
-            -c host=${{ inputs.host }} \
-            -c stackName=${{ inputs.stackName }} \
+            -c aliasRecordName=${{ vars.ALIAS_RECORD_NAME }} \
+            -c bucketName=${{ vars.BUCKET_NAME }} \
+            -c cachePolicyName=${{ vars.CACHE_POLICY_NAME }} \
+            -c deploymentName=${{ vars.DEPLOYMENT_NAME }} \
+            -c distributionName=${{ vars.DISTRIBUTION_NAME }} \
+            -c domains=${{ vars.DOMAINS }} \
+            -c host=${{ vars.HOST }} \
+            -c stackName=${{ vars.STACK_NAME }} \
 
   # # deploy:
   # #   runs-on: ubuntu-latest

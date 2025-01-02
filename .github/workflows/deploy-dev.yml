@@ -1,5 +1,5 @@
-name: ADC website deployment [PRODUCTION]
-run-name: Deploy ADC website to PRODUCTION [@${{ github.actor }}]
+name: ADC website deployment [DEV]
+run-name: Deploy ADC website to DEV [@${{ github.actor }}]
 
 on:
   workflow_dispatch:
@@ -10,4 +10,4 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      environment: PROD
+      environment: DEV
