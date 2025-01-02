@@ -54,6 +54,7 @@ jobs:
             -c deploymentName=${{ vars.DEPLOYMENT_NAME }} \
             -c distributionName=${{ vars.DISTRIBUTION_NAME }} \
             -c domains=${{ vars.DOMAINS }} \
+            -c versionRewriteFunctionName=${{ vars.VERSION_REWRITE_FUNCTION_NAME }} \
             -c host=${{ vars.HOST }} \
             -c stackName=${{ vars.STACK_NAME }} \
 
