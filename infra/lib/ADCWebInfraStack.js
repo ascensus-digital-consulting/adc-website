@@ -44,7 +44,7 @@ class ADCWebInfraStack extends Stack {
       versionRewriteFunctionName,
       {
         code: cloudfront.FunctionCode.fromFile({
-          filePath: 'versionRewriteFunction.js',
+          filePath: 'lib/versionRewriteFunction.js',
         }),
       }
     );
