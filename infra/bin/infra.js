@@ -25,6 +25,9 @@ function defineContext(app) {
     domains: app.node.tryGetContext('domains'),
     host: app.node.tryGetContext('host') || '',
     stackName: app.node.tryGetContext('stackName'),
+    versionRewriteFunctionName: app.node.tryGetContext(
+      'versionRewriteFunctionName'
+    ),
   };
   validateContext(context);
   return context;

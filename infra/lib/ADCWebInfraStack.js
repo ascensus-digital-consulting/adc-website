@@ -19,17 +19,36 @@ class ADCWebInfraStack extends Stack {
     const aliasRecordName = props.env.context.aliasRecordName;
     const cachePolicyName = props.env.context.cachePolicyName;
     const domains = props.env.context.domains;
+    const versionRewriteFunctionName =
+      props.env.context.versionRewriteFunctionName;
 
     const bucket = this.#createBucket(bucketName);
     const cachePolicy = this.#createCachePolicy(cachePolicyName);
+    const versionRewriteFunction = this.#createVersionRewriteFunctionName(
+      versionRewriteFunctionName
+    );
     const distribution = this.#createDistribution(
       distributionName,
       cachePolicy,
       domains,
-      bucket
+      bucket,
+      versionRewriteFunction
     );
     this.#createDeployment(deploymentName, bucket, distribution);
     this.#createAliasRecord(aliasRecordName, host, distribution);
+  }
+
+  #createVersionRewriteFunctionName(versionRewriteFunctionName) {
+    const versionRewriteFunction = new cloudfront.Function(
+      this,
+      versionRewriteFunctionName,
+      {
+        code: cloudfront.FunctionCode.fromFile({
+          filePath: 'versionRewriteFunction.js',
+        }),
+      }
+    );
+    return versionRewriteFunction;
   }
 
   #createBucket(bucketName) {
@@ -39,7 +58,6 @@ class ADCWebInfraStack extends Stack {
       autoDeleteObjects: true,
       enforceSSL: true,
     });
-
     return bucket;
   }
 
@@ -49,17 +67,28 @@ class ADCWebInfraStack extends Stack {
       minTtl: cdk.Duration.minutes(30), // Set the minimum TTL to 30 minutes
       maxTtl: cdk.Duration.minutes(60), // Set the maximum TTL to 60 minutes
     });
-
     return cachePolicy;
   }
 
-  #createDistribution(distributionName, cachePolicy, domains, bucket) {
+  #createDistribution(
+    distributionName,
+    cachePolicy,
+    domains,
+    bucket,
+    versionRewriteFunction
+  ) {
     const defaultBehavior = {
       origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS, // Enforce HTTPS
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD, // Allow only GET and HEAD methods
       cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD, // Cache GET and HEAD methods
       cachePolicy: cachePolicy,
+      functionAssociations: [
+        {
+          function: versionRewriteFunction,
+          eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+        },
+      ],
     };
     const props = {
       defaultBehavior: defaultBehavior,
@@ -76,7 +105,6 @@ class ADCWebInfraStack extends Stack {
       distributionName,
       props
     );
-
     return distribution;
   }
 
@@ -87,7 +115,6 @@ class ADCWebInfraStack extends Stack {
       distribution: distribution,
       distributionPaths: ['/*'],
     });
-
     return deployment;
   }
 
@@ -113,7 +140,6 @@ class ADCWebInfraStack extends Stack {
     };
 
     const aliasRecord = new route53.ARecord(this, aliasRecordName, props);
-
     return aliasRecord;
   }
 }
