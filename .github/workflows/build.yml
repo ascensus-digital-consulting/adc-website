@@ -123,7 +123,7 @@ jobs:
   tag-with-version:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [static-analysis, security-tests, destroy-infra]
+    needs: [static-analysis, security-tests, ui-tests]
 
     steps:
       - name: Checkout repository
