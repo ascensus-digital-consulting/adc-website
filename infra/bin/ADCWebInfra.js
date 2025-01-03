@@ -28,6 +28,8 @@ function defineContext(app) {
     versionRewriteFunctionName: app.node.tryGetContext(
       'versionRewriteFunctionName'
     ),
+    hostedZoneId: app.node.tryGetContext('hostedZoneId'),
+    zoneName: app.node.tryGetContext('zoneName'),
   };
   validateContext(context);
   return context;
