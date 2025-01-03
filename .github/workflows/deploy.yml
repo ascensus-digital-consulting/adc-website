@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Add metadata file to deployment package
+      - name: Add metadata file to deployment package
         run: |
           export TZ=US/Pacific
           METADATA_FILE_NAME=metadata.json
