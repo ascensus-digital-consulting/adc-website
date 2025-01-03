@@ -7,9 +7,31 @@ on:
       - main
 
 jobs:
-  ui-tests:
+  deploy-infra:
     uses: ./.github/workflows/deploy-dev.yml
     secrets: inherit
+
+  ui-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: deploy-infra
+
+    steps:
+      - name: Test website UI
+        run: echo 'TODO - create UI tests'
+
+  destroy-infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: ui-tests
+    environment: DEV
+
+    steps:
+      - name: Install AWS CLI
+        run: npm install aws
+
+      - name: Destroy infrastructure
+        run: aws cloudformation destroy ${{ vars.STACK_NAME }}
 
   static-analysis:
     runs-on: ubuntu-latest
@@ -89,7 +111,7 @@ jobs:
   tag-with-version:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [static-analysis, security-tests, ui-tests]
+    needs: [static-analysis, security-tests, destroy-infra]
 
     steps:
       - name: Checkout repository
