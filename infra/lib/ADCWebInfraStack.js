@@ -77,6 +77,7 @@ class ADCWebInfraStack extends Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       enforceSSL: true,
+      versioned: false,
     });
     return bucket;
   }
