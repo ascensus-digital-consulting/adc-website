@@ -27,7 +27,7 @@ jobs:
           export TZ=US/Pacific
           METADATA_FILE_NAME=metadata.json
           METADATA_FILE_PATH=${{ github.workspace }}/web/src/$METADATA_FILE_NAME
-          VERSION=$GITHUB_REF_NAME
+          if [ "$GITHUB_REF_NAME" == "main" ]; then VERSION="v0.0.0.0-ephemeral-release"; else VERSION=$GITHUB_REF_NAME; fi
           NEW_CONTENT="{
             \"version\": \"$VERSION\",
             \"released-at\": \"$(date +%d-%m-%Y" "%H:%M:%S)\"
