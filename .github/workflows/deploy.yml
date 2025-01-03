@@ -29,8 +29,8 @@ jobs:
           METADATA_FILE_PATH=${{ github.workspace }}/web/src/$METADATA_FILE_NAME
           METADATA=$GITHUB_REF_NAME
           NEW_CONTENT="{
-            \"version\":\"${VERSION:-0.0.0.0-ephemeral-release}\",
-            \"released-at\":\"$(date +%d-%m-%Y" "%H:%M:%S)\"
+            \"version\": \"${VERSION:-0.0.0.0-ephemeral-release}\",
+            \"released-at\": \"$(date +%d-%m-%Y" "%H:%M:%S)\"
           }"
           echo "$NEW_CONTENT" > $METADATA_FILE_PATH
 

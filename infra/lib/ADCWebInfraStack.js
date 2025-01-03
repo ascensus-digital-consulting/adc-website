@@ -8,10 +8,12 @@ const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
+/*** */
 class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
+    // Obtain context values
     const host = props.env.context.host;
     const bucketName = props.env.context.bucketName;
     const distributionName = props.env.context.distributionName;
@@ -21,24 +23,40 @@ class ADCWebInfraStack extends Stack {
     const domains = props.env.context.domains;
     const versionRewriteFunctionName =
       props.env.context.versionRewriteFunctionName;
+    const hostedZoneId = props.env.context.hostedZoneId;
+    const zoneName = props.env.context.zoneName;
 
-    const bucket = this.#createBucket(bucketName);
-    const cachePolicy = this.#createCachePolicy(cachePolicyName);
-    const versionRewriteFunction = this.#createVersionRewriteFunctionName(
+    // Create bucket
+    const bucket = this.bucket(bucketName);
+
+    // Create distribution
+    const versionRewriteFunction = this.#metadataRewriteFunction(
       versionRewriteFunctionName
     );
-    const distribution = this.#createDistribution(
+    const cachePolicy = this.#cachePolicy(cachePolicyName);
+    const distribution = this.#distribution(
       distributionName,
       cachePolicy,
       domains,
       bucket,
       versionRewriteFunction
     );
-    this.#createDeployment(deploymentName, bucket, distribution);
-    this.#createAliasRecord(aliasRecordName, host, distribution);
+
+    // Create A record
+    const zone = this.#hostedZone(hostedZoneId, zoneName);
+    this.#aliasRecord(aliasRecordName, host, distribution, zone);
+
+    // Deploy website code to S3
+    this.#deployment(deploymentName, bucket, distribution);
   }
 
-  #createVersionRewriteFunctionName(versionRewriteFunctionName) {
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create the Cloudfront function that rewrites (without quotes)
+  // "metadata" to "metadata.json"
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #metadataRewriteFunction(versionRewriteFunctionName) {
     const versionRewriteFunction = new cloudfront.Function(
       this,
       versionRewriteFunctionName,
@@ -51,7 +69,12 @@ class ADCWebInfraStack extends Stack {
     return versionRewriteFunction;
   }
 
-  #createBucket(bucketName) {
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // ...
+  //
+  ////////////////////////////////////////////////////////////////////////
+  bucket(bucketName) {
     const bucket = new s3.Bucket(this, bucketName, {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -61,7 +84,12 @@ class ADCWebInfraStack extends Stack {
     return bucket;
   }
 
-  #createCachePolicy(cachePolicyName) {
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // ...
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #cachePolicy(cachePolicyName) {
     const cachePolicy = new cloudfront.CachePolicy(this, cachePolicyName, {
       defaultTtl: cdk.Duration.minutes(30), // Set the default TTL to 30 minutes
       minTtl: cdk.Duration.minutes(30), // Set the minimum TTL to 30 minutes
@@ -70,7 +98,12 @@ class ADCWebInfraStack extends Stack {
     return cachePolicy;
   }
 
-  #createDistribution(
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // ...
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #distribution(
     distributionName,
     cachePolicy,
     domains,
@@ -108,7 +141,12 @@ class ADCWebInfraStack extends Stack {
     return distribution;
   }
 
-  #createDeployment(deploymenName, bucket, distribution) {
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // ...
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #deployment(deploymenName, bucket, distribution) {
     const deployment = new s3deploy.BucketDeployment(this, deploymenName, {
       sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
       destinationBucket: bucket,
@@ -118,18 +156,26 @@ class ADCWebInfraStack extends Stack {
     return deployment;
   }
 
-  #createAliasRecord(aliasRecordName, host, distribution) {
-    const hostedZoneId = 'Z02235921WTFRIR8NQIBR'; // get from props or SSM lookup (Z****)
-    const zoneName = 'ascensus.digital'; // get from props or SSM lookup (mydomain.com)
-    const zone = route53.HostedZone.fromHostedZoneAttributes(
-      this,
-      'ADCImportedZone',
-      {
-        hostedZoneId,
-        zoneName,
-      }
-    );
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // ...
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #aliasRecord(aliasRecordName, host, distribution, zone) {
+    // const hostedZoneId = 'Z02235921WTFRIR8NQIBR'; // get from props or SSM lookup (Z****)
+    // const zoneName = 'ascensus.digital'; // get from props or SSM lookup (mydomain.com)
+    const props = this.#createAliasProps(host, distribution, zone);
+    const aliasRecord = new route53.ARecord(this, aliasRecordName, props);
+    return aliasRecord;
+  }
 
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create the Cloudfront function that rewrites (without quotes)
+  // "metadata" to "metadata.json"
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #createAliasProps(host, distribution, zone) {
     const props = {
       target: route53.RecordTarget.fromAlias(
         new targets.CloudFrontTarget(distribution)
@@ -138,9 +184,24 @@ class ADCWebInfraStack extends Stack {
       deleteExisting: true,
       recordName: host,
     };
+    return props;
+  }
 
-    const aliasRecord = new route53.ARecord(this, aliasRecordName, props);
-    return aliasRecord;
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Configure the Route53 hosted zone for DNS updates
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #hostedZone(hostedZoneId, zoneName) {
+    const zone = route53.HostedZone.fromHostedZoneAttributes(
+      this,
+      'ADCImportedZone',
+      {
+        hostedZoneId,
+        zoneName,
+      }
+    );
+    return zone;
   }
 }
 
