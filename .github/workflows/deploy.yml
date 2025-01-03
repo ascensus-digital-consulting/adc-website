@@ -60,6 +60,8 @@ jobs:
             -c versionRewriteFunctionName=${{ vars.VERSION_REWRITE_FUNCTION_NAME }} \
             -c host=${{ vars.HOST }} \
             -c stackName=${{ vars.STACK_NAME }} \
+            -c hostedZoneId=${{ vars.HOSTED_ZONE_ID }} \
+            -c zoneName=${{ vars.ZONE_NAME }} \
 
   smoke-test:
     runs-on: ubuntu-latest
