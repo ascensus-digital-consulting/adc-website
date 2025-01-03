@@ -13,41 +13,42 @@ class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
-    // Obtain context values
-    const host = props.env.context.host;
-    const bucketName = props.env.context.bucketName;
-    const distributionName = props.env.context.distributionName;
-    const deploymentName = props.env.context.deploymentName;
-    const aliasRecordName = props.env.context.aliasRecordName;
-    const cachePolicyName = props.env.context.cachePolicyName;
-    const domains = props.env.context.domains;
-    const versionRewriteFunctionName =
-      props.env.context.versionRewriteFunctionName;
-    const hostedZoneId = props.env.context.hostedZoneId;
-    const zoneName = props.env.context.zoneName;
+    // Obtain context values from environment
+    const context = props.env.context;
 
     // Create bucket
-    const bucket = this.bucket(bucketName);
+    const bucket = this.#bucket(context.bucketName);
 
     // Create distribution
-    const versionRewriteFunction = this.#metadataRewriteFunction(
-      versionRewriteFunctionName
+    const cachePolicy = this.#cachePolicy(context.cachePolicyName);
+    const metadataRewriteFunction = this.#metadataRewriteFunction(
+      context.metadataRewriteFunctionName
     );
-    const cachePolicy = this.#cachePolicy(cachePolicyName);
-    const distribution = this.#distribution(
-      distributionName,
-      cachePolicy,
-      domains,
+    const defaultBehavior = this.#defaultBehavior(
       bucket,
-      versionRewriteFunction
+      cachePolicy,
+      metadataRewriteFunction
+    );
+    const distributionProps = this.#distributionProps(
+      defaultBehavior,
+      context.domains
+    );
+    const distribution = this.#distribution(
+      context.distributionName,
+      distributionProps
     );
 
     // Create A record
-    const zone = this.#hostedZone(hostedZoneId, zoneName);
-    this.#aliasRecord(aliasRecordName, host, distribution, zone);
+    const zone = this.#hostedZone(context.hostedZoneId, context.zoneName);
+    this.#aliasRecord(
+      distribution,
+      context.host,
+      context.aliasRecordName,
+      zone
+    );
 
     // Deploy website code to S3
-    this.#deployment(deploymentName, bucket, distribution);
+    this.#deployment(bucket, distribution, context.deploymentName);
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -56,26 +57,22 @@ class ADCWebInfraStack extends Stack {
   // "metadata" to "metadata.json"
   //
   ////////////////////////////////////////////////////////////////////////
-  #metadataRewriteFunction(versionRewriteFunctionName) {
-    const versionRewriteFunction = new cloudfront.Function(
-      this,
-      versionRewriteFunctionName,
-      {
-        code: cloudfront.FunctionCode.fromFile({
-          filePath: 'lib/versionRewriteFunction.js',
-        }),
-      }
-    );
-    return versionRewriteFunction;
+  #metadataRewriteFunction(name) {
+    const fn = new cloudfront.Function(this, name, {
+      code: cloudfront.FunctionCode.fromFile({
+        filePath: 'lib/metadataRewriteFunction.js',
+      }),
+    });
+    return fn;
   }
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // ...
+  // Create bucket to store website files
   //
   ////////////////////////////////////////////////////////////////////////
-  bucket(bucketName) {
-    const bucket = new s3.Bucket(this, bucketName, {
+  #bucket(name) {
+    const bucket = new s3.Bucket(this, name, {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -86,11 +83,11 @@ class ADCWebInfraStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // ...
+  // Configure cache policy for website (via Cloudfront)
   //
   ////////////////////////////////////////////////////////////////////////
-  #cachePolicy(cachePolicyName) {
-    const cachePolicy = new cloudfront.CachePolicy(this, cachePolicyName, {
+  #cachePolicy(name) {
+    const cachePolicy = new cloudfront.CachePolicy(this, name, {
       defaultTtl: cdk.Duration.minutes(30), // Set the default TTL to 30 minutes
       minTtl: cdk.Duration.minutes(30), // Set the minimum TTL to 30 minutes
       maxTtl: cdk.Duration.minutes(60), // Set the maximum TTL to 60 minutes
@@ -100,17 +97,11 @@ class ADCWebInfraStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // ...
+  // Configure default behavior for Cloudfront distribution
   //
   ////////////////////////////////////////////////////////////////////////
-  #distribution(
-    distributionName,
-    cachePolicy,
-    domains,
-    bucket,
-    versionRewriteFunction
-  ) {
-    const defaultBehavior = {
+  #defaultBehavior(bucket, cachePolicy, fn) {
+    const behavior = {
       origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS, // Enforce HTTPS
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD, // Allow only GET and HEAD methods
@@ -118,13 +109,22 @@ class ADCWebInfraStack extends Stack {
       cachePolicy: cachePolicy,
       functionAssociations: [
         {
-          function: versionRewriteFunction,
+          function: fn,
           eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
         },
       ],
     };
+    return behavior;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Configure the properties for the Cloudfront distribution
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #distributionProps(behavior, domains) {
     const props = {
-      defaultBehavior: defaultBehavior,
+      defaultBehavior: behavior,
       domainNames: domains.split(','), // Add your domain names here
       defaultRootObject: 'index.html', // Set the default root object to index.html
       certificate: Certificate.fromCertificateArn(
@@ -133,21 +133,26 @@ class ADCWebInfraStack extends Stack {
         'arn:aws:acm:us-east-1:030460844096:certificate/43b0f99a-a402-4ff1-916c-687c79bcef1d' // Replace with your certificate ARN
       ),
     };
-    const distribution = new cloudfront.Distribution(
-      this,
-      distributionName,
-      props
-    );
+    return props;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create the Cloudfront distribution
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #distribution(name, props) {
+    const distribution = new cloudfront.Distribution(this, name, props);
     return distribution;
   }
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // ...
+  // Deploy website files into S3
   //
   ////////////////////////////////////////////////////////////////////////
-  #deployment(deploymenName, bucket, distribution) {
-    const deployment = new s3deploy.BucketDeployment(this, deploymenName, {
+  #deployment(bucket, distribution, name) {
+    const deployment = new s3deploy.BucketDeployment(this, name, {
       sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
       destinationBucket: bucket,
       distribution: distribution,
@@ -158,14 +163,12 @@ class ADCWebInfraStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // ...
+  // Create DNS subdomain record for release
   //
   ////////////////////////////////////////////////////////////////////////
-  #aliasRecord(aliasRecordName, host, distribution, zone) {
-    // const hostedZoneId = 'Z02235921WTFRIR8NQIBR'; // get from props or SSM lookup (Z****)
-    // const zoneName = 'ascensus.digital'; // get from props or SSM lookup (mydomain.com)
+  #aliasRecord(distribution, host, name, zone) {
     const props = this.#createAliasProps(host, distribution, zone);
-    const aliasRecord = new route53.ARecord(this, aliasRecordName, props);
+    const aliasRecord = new route53.ARecord(this, name, props);
     return aliasRecord;
   }
 

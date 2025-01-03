@@ -26,6 +26,7 @@ jobs:
 
   destroy-infra:
     runs-on: ubuntu-latest
+    if: '!cancelled()'
     timeout-minutes: 10
     needs: ui-tests
     environment: DEV

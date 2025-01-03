@@ -5,16 +5,18 @@ const { ADCWebInfraStack } = require('../lib/ADCWebInfraStack');
 const { ADCUtils } = require('../lib/ADCUtils');
 
 /*** Setup ***/
-
 const app = new cdk.App();
 const context = defineContext(app);
-
 const props = defineStackProps(context, context);
 
 /*** Create stack ***/
 const stack = new ADCWebInfraStack(app, context.stackName, props);
 
-/*** Supporting functions ***/
+////////////////////////////////////////////////////////////////////////
+//
+// Obtain all required context values provided with the cdk command
+//
+////////////////////////////////////////////////////////////////////////
 function defineContext(app) {
   const context = {
     aliasRecordName: app.node.tryGetContext('aliasRecordName'),
@@ -25,8 +27,8 @@ function defineContext(app) {
     domains: app.node.tryGetContext('domains'),
     host: app.node.tryGetContext('host') || '',
     stackName: app.node.tryGetContext('stackName'),
-    versionRewriteFunctionName: app.node.tryGetContext(
-      'versionRewriteFunctionName'
+    metadataRewriteFunctionName: app.node.tryGetContext(
+      'metadataRewriteFunctionName'
     ),
     hostedZoneId: app.node.tryGetContext('hostedZoneId'),
     zoneName: app.node.tryGetContext('zoneName'),
@@ -35,6 +37,11 @@ function defineContext(app) {
   return context;
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Validate that all of the required values are defined
+//
+////////////////////////////////////////////////////////////////////////
 function validateContext(context) {
   const undefValues = [];
   for (let key in context) {
@@ -51,6 +58,11 @@ function validateContext(context) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Define the properties to provide to the stack
+//
+////////////////////////////////////////////////////////////////////////
 function defineStackProps(context, stackName) {
   const props = {
     env: {
