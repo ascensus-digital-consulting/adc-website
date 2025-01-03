@@ -62,6 +62,7 @@ class ADCWebInfraStack extends Stack {
       code: cloudfront.FunctionCode.fromFile({
         filePath: 'lib/metadataRewriteFunction.js',
       }),
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
     });
     return fn;
   }
