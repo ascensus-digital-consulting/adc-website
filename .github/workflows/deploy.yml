@@ -30,7 +30,7 @@ jobs:
           if [ "$GITHUB_REF_NAME" == "main" ]; then VERSION="v0.0.0.0-ephemeral-release"; else VERSION=$GITHUB_REF_NAME; fi
           NEW_CONTENT="{
             \"version\": \"$VERSION\",
-            \"released-at\": \"$(date +%d-%m-%Y" "%H:%M:%S)\"
+            \"released-at\": \"$(date +%d-%m-%Y" "%H:%M:%S) PST\"
           }"
           echo "$NEW_CONTENT" > $METADATA_FILE_PATH
 
