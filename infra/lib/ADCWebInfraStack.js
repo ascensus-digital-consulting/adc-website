@@ -8,7 +8,6 @@ const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
-/*** */
 class ADCWebInfraStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
