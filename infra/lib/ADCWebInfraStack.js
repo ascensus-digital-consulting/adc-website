@@ -20,14 +20,13 @@ class ADCWebInfraStack extends Stack {
 
     // Create distribution
     const cachePolicy = this.#cachePolicy(context.cachePolicyName);
-    const metadataRewriteFunction = this.#metadataRewriteFunction(
-      context.host,
-      context.metadataRewriteFunctionName
+    const viewerRequestHandler = this.viewerRequestHandler(
+      context.viewerRequestHandlerName
     );
     const defaultBehavior = this.#defaultBehavior(
       bucket,
       cachePolicy,
-      metadataRewriteFunction
+      viewerRequestHandler
     );
     const distributionProps = this.#distributionProps(
       defaultBehavior,
@@ -199,10 +198,8 @@ class ADCWebInfraStack extends Stack {
   // "metadata" to "metadata.json"
   //
   ////////////////////////////////////////////////////////////////////////
-  #metadataRewriteFunction(host, name) {
-    const filePath = host
-      ? 'lib/metadataRewriteWithAuthzFunction.js'
-      : 'lib/metadataRewriteFunction.js';
+  viewerRequestHandler(name) {
+    const filePath = 'lib/handlers/viewerRequestHandler';
     const fn = new cloudfront.Function(this, name, {
       code: cloudfront.FunctionCode.fromFile({
         filePath: filePath,
