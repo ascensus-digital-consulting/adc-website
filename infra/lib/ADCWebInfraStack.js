@@ -56,10 +56,13 @@ class ADCWebInfraStack extends Stack {
   // "metadata" to "metadata.json"
   //
   ////////////////////////////////////////////////////////////////////////
-  #metadataRewriteFunction(name) {
+  #metadataRewriteFunction(host, name) {
+    const filePath = host
+      ? 'lib/metadataRewriteFunction.js'
+      : 'lib/metadataRewriteWithAuthzFunction.js';
     const fn = new cloudfront.Function(this, name, {
       code: cloudfront.FunctionCode.fromFile({
-        filePath: 'lib/metadataRewriteFunction.js',
+        filePath: filePath,
       }),
       runtime: cloudfront.FunctionRuntime.JS_2_0,
     });
