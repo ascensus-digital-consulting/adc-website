@@ -21,6 +21,7 @@ class ADCWebInfraStack extends Stack {
     // Create distribution
     const cachePolicy = this.#cachePolicy(context.cachePolicyName);
     const metadataRewriteFunction = this.#metadataRewriteFunction(
+      context.host,
       context.metadataRewriteFunctionName
     );
     const defaultBehavior = this.#defaultBehavior(
