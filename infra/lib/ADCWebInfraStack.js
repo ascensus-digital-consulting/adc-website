@@ -57,17 +57,27 @@ class ADCWebInfraStack extends Stack {
   // "metadata" to "metadata.json"
   //
   ////////////////////////////////////////////////////////////////////////
-  #metadataRewriteFunction(host, name) {
-    const filePath = host
-      ? 'lib/metadataRewriteFunction.js'
-      : 'lib/metadataRewriteWithAuthzFunction.js';
-    const fn = new cloudfront.Function(this, name, {
-      code: cloudfront.FunctionCode.fromFile({
-        filePath: filePath,
-      }),
-      runtime: cloudfront.FunctionRuntime.JS_2_0,
-    });
-    return fn;
+  #aliasProps(host, distribution, zone) {
+    const props = {
+      target: route53.RecordTarget.fromAlias(
+        new targets.CloudFrontTarget(distribution)
+      ),
+      zone: zone,
+      deleteExisting: true,
+      recordName: host,
+    };
+    return props;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create DNS subdomain record for release
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #aliasRecord(distribution, host, name, zone) {
+    const props = this.#aliasProps(host, distribution, zone);
+    const aliasRecord = new route53.ARecord(this, name, props);
+    return aliasRecord;
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -124,6 +134,31 @@ class ADCWebInfraStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
+  // Deploy website files into S3
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #deployment(bucket, distribution, name) {
+    const deployment = new s3deploy.BucketDeployment(this, name, {
+      sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
+      destinationBucket: bucket,
+      distribution: distribution,
+      distributionPaths: ['/*'],
+    });
+    return deployment;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create the Cloudfront distribution
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #distribution(name, props) {
+    const distribution = new cloudfront.Distribution(this, name, props);
+    return distribution;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
   // Configure the properties for the Cloudfront distribution
   //
   ////////////////////////////////////////////////////////////////////////
@@ -143,60 +178,6 @@ class ADCWebInfraStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // Create the Cloudfront distribution
-  //
-  ////////////////////////////////////////////////////////////////////////
-  #distribution(name, props) {
-    const distribution = new cloudfront.Distribution(this, name, props);
-    return distribution;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Deploy website files into S3
-  //
-  ////////////////////////////////////////////////////////////////////////
-  #deployment(bucket, distribution, name) {
-    const deployment = new s3deploy.BucketDeployment(this, name, {
-      sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
-      destinationBucket: bucket,
-      distribution: distribution,
-      distributionPaths: ['/*'],
-    });
-    return deployment;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Create DNS subdomain record for release
-  //
-  ////////////////////////////////////////////////////////////////////////
-  #aliasRecord(distribution, host, name, zone) {
-    const props = this.#createAliasProps(host, distribution, zone);
-    const aliasRecord = new route53.ARecord(this, name, props);
-    return aliasRecord;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Create the Cloudfront function that rewrites (without quotes)
-  // "metadata" to "metadata.json"
-  //
-  ////////////////////////////////////////////////////////////////////////
-  #createAliasProps(host, distribution, zone) {
-    const props = {
-      target: route53.RecordTarget.fromAlias(
-        new targets.CloudFrontTarget(distribution)
-      ),
-      zone: zone,
-      deleteExisting: true,
-      recordName: host,
-    };
-    return props;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
   // Configure the Route53 hosted zone for DNS updates
   //
   ////////////////////////////////////////////////////////////////////////
@@ -210,6 +191,25 @@ class ADCWebInfraStack extends Stack {
       }
     );
     return zone;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  // Create the Cloudfront function that rewrites (without quotes)
+  // "metadata" to "metadata.json"
+  //
+  ////////////////////////////////////////////////////////////////////////
+  #metadataRewriteFunction(host, name) {
+    const filePath = host
+      ? 'lib/metadataRewriteWithAuthzFunction.js'
+      : 'lib/metadataRewriteFunction.js';
+    const fn = new cloudfront.Function(this, name, {
+      code: cloudfront.FunctionCode.fromFile({
+        filePath: filePath,
+      }),
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+    });
+    return fn;
   }
 }
 
