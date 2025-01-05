@@ -4,8 +4,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 function handler(event) {
-  let request = metadataRewriteHandler(event);
-  event.request = request;
+  metadataRewriteHandler(event);
   let requestOrResponse = authzHandler(event);
   return requestOrResponse;
 }
