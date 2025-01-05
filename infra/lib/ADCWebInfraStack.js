@@ -199,7 +199,7 @@ class ADCWebInfraStack extends Stack {
   //
   ////////////////////////////////////////////////////////////////////////
   viewerRequestHandler(name) {
-    const filePath = 'lib/handlers/viewerRequestHandler';
+    const filePath = 'lib/handlers/viewerRequestHandler.js';
     const fn = new cloudfront.Function(this, name, {
       code: cloudfront.FunctionCode.fromFile({
         filePath: filePath,
