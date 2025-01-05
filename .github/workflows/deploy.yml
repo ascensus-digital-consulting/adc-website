@@ -73,6 +73,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Smoke test
+      - name: Smoke test a production environment
         if: ${{ ! vars.HOST }}
-        run: bash web/test/scripts/smoke-test.sh https://${{ vars.PRIMARY_DOMAIN }}
+        run: bash web/test/scripts/smoke-test-prod.sh https://${{ vars.PRIMARY_DOMAIN }}
+
+      - name: Smoke test a pre-production environment
+        if: ${{ vars.HOST }}
+        run: bash web/test/scripts/smoke-test-preprod.sh https://${{ vars.PRIMARY_DOMAIN }}
