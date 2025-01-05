@@ -7,7 +7,7 @@ printResult() {
   echo "Initiating smoke test against $URL"
   HTTP_CODE_ACTUAL=$(curl -o /dev/null --silent --write-out '%{http_code}\n' $URL)
   tput setaf 3
-  echo "Smoke test against $url complete"
+  echo "Smoke test against $URL complete"
 
   if [ $HTTP_CODE_ACTUAL -eq $HTTP_CODE_EXPECTED ]; then
     tput setaf 2
