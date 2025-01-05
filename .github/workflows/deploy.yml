@@ -75,8 +75,8 @@ jobs:
 
       - name: Smoke test a production environment
         if: ${{ ! vars.HOST }}
-        run: bash web/test/scripts/smoke-test-prod.sh https://${{ vars.PRIMARY_DOMAIN }}
+        run: bash web/test/scripts/smoke-test-prod.sh ${{ vars.PRIMARY_DOMAIN }}
 
       - name: Smoke test a pre-production environment
         if: ${{ vars.HOST }}
-        run: bash web/test/scripts/smoke-test-preprod.sh https://${{ vars.PRIMARY_DOMAIN }}
+        run: bash web/test/scripts/smoke-test-preprod.sh ${{ vars.PRIMARY_DOMAIN }}
