@@ -27,7 +27,7 @@ function defineContext(app) {
     domains: app.node.tryGetContext('domains'),
     host: app.node.tryGetContext('host') || '',
     stackName: app.node.tryGetContext('stackName'),
-    metadataRewriteFunctionName: app.node.tryGetContext(
+    viewerRequestHandlerName: app.node.tryGetContext(
       'metadataRewriteFunctionName'
     ),
     hostedZoneId: app.node.tryGetContext('hostedZoneId'),
