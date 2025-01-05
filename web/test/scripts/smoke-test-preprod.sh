@@ -1,7 +1,7 @@
 #! /bin/bash
 DOMAIN=$1
 export TERM=xterm-256color
-source ./adclib.sh
+source ./web/test/scripts/adclib.sh
 
 printResult "https://$DOMAIN" 401
 printResult "https://christopher:bingo!@$DOMAIN" 200
