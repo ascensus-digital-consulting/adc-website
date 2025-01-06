@@ -2,7 +2,6 @@
 
 const cdk = require('aws-cdk-lib');
 const { ADCWebInfraStack } = require('../lib/ADCWebInfraStack');
-const { ADCUtils } = require('../lib/ADCUtils');
 
 /*** Setup ***/
 const app = new cdk.App();
