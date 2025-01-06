@@ -53,9 +53,7 @@ function metadataRewriteHandler(event) {
 ////////////////////////////////////////////////////////////////////////
 function isProduction(headers) {
   let productionDomains = ['ascensus.digital', 'www.ascensus.digital'];
-  let host = headers.host ? headers.host.value : '';
-  let production = productionDomains.includes(host);
-
+  let production = productionDomains.includes(headers.host.value);
   return production;
 }
 
@@ -77,6 +75,7 @@ function configureResponse() {
   };
 }
 
+/* istanbul ignore next */
 if (console.error) {
   module.exports = handler;
 }
