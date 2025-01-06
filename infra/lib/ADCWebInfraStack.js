@@ -14,14 +14,15 @@ class ADCWebInfraStack extends Stack {
 
     // Obtain context values from environment
     const context = props.env.context;
+    const names = context.resourceNames;
 
     // Create bucket
-    const bucket = this.#bucket(context.bucketName);
+    const bucket = this.#bucket(names.bucket);
 
     // Create distribution
-    const cachePolicy = this.#cachePolicy(context.cachePolicyName);
+    const cachePolicy = this.#cachePolicy(names.cachePolicy);
     const viewerRequestHandler = this.viewerRequestHandler(
-      context.viewerRequestHandlerName
+      names.viewerRequestHandler
     );
     const defaultBehavior = this.#defaultBehavior(
       bucket,
@@ -33,21 +34,16 @@ class ADCWebInfraStack extends Stack {
       context.domains
     );
     const distribution = this.#distribution(
-      context.distributionName,
+      names.distribution,
       distributionProps
     );
 
     // Create A record
     const zone = this.#hostedZone(context.hostedZoneId, context.zoneName);
-    this.#aliasRecord(
-      distribution,
-      context.host,
-      context.aliasRecordName,
-      zone
-    );
+    this.#aliasRecord(distribution, context.host, names.aliasRecord, zone);
 
     // Deploy website code to S3
-    this.#deployment(bucket, distribution, context.deploymentName);
+    this.#deployment(bucket, distribution, names.deployment);
   }
 
   ////////////////////////////////////////////////////////////////////////
