@@ -7,10 +7,11 @@ const { ADCUtils } = require('../lib/ADCUtils');
 /*** Setup ***/
 const app = new cdk.App();
 const context = defineContext(app);
-const props = defineStackProps(context, context);
+const names = context.resourceNames;
+const props = defineStackProps(context);
 
 /*** Create stack ***/
-const stack = new ADCWebInfraStack(app, context.stackName, props);
+const stack = new ADCWebInfraStack(app, names.stack, props);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -19,17 +20,17 @@ const stack = new ADCWebInfraStack(app, context.stackName, props);
 ////////////////////////////////////////////////////////////////////////
 function defineContext(app) {
   const context = {
-    aliasRecordName: app.node.tryGetContext('aliasRecordName'),
-    bucketName: app.node.tryGetContext('bucketName'),
-    cachePolicyName: app.node.tryGetContext('cachePolicyName'),
-    deploymentName: app.node.tryGetContext('deploymentName'),
-    distributionName: app.node.tryGetContext('distributionName'),
+    resourceNames: {
+      aliasRecord: app.node.tryGetContext('aliasRecordName'),
+      bucket: app.node.tryGetContext('bucketName'),
+      cachePolicy: app.node.tryGetContext('cachePolicyName'),
+      deployment: app.node.tryGetContext('deploymentName'),
+      distribution: app.node.tryGetContext('distributionName'),
+      stack: app.node.tryGetContext('stackName'),
+      viewerRequestHandler: app.node.tryGetContext('viewerRequestHandlerName'),
+    },
     domains: app.node.tryGetContext('domains'),
     host: app.node.tryGetContext('host') || '',
-    stackName: app.node.tryGetContext('stackName'),
-    viewerRequestHandlerName: app.node.tryGetContext(
-      'metadataRewriteFunctionName'
-    ),
     hostedZoneId: app.node.tryGetContext('hostedZoneId'),
     zoneName: app.node.tryGetContext('zoneName'),
   };
@@ -43,15 +44,19 @@ function defineContext(app) {
 //
 ////////////////////////////////////////////////////////////////////////
 function validateContext(context) {
-  const undefValues = [];
-  for (let key in context) {
-    if (context[key] === undefined) {
-      undefValues.push(key);
-    }
-  }
-  if (undefValues.length > 0) {
+  const undefContextValues = Object.entries(context).filter(
+    (entry) => entry[1] === undefined
+  );
+  const undefNameValues = Object.entries(context.resourceNames).filter(
+    (entry) => entry[1] === undefined
+  );
+  const undefAllValues = undefContextValues
+    .concat(undefNameValues)
+    .map((entry) => entry[0]);
+
+  if (undefAllValues.length > 0) {
     throw Error(
-      `The following context values are undefined: ${undefValues.join(
+      `The following context values are undefined: ${undefAllValues.join(
         ', '
       )}. Please specify context values using the --context (or -c) switch when using cdk deploy.`
     );
@@ -69,7 +74,7 @@ function defineStackProps(context, stackName) {
       account: process.env.CDK_DEFAULT_ACCOUNT,
       region: process.env.CDK_DEFAULT_REGION,
       context: context,
-      stackName: stackName,
+      stackName: context.resourceNames.stack,
     },
   };
   return props;
