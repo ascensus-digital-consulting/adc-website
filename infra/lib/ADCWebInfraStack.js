@@ -134,7 +134,7 @@ class ADCWebInfraStack extends Stack {
   ////////////////////////////////////////////////////////////////////////
   #deployment(bucket, distribution, name) {
     const deployment = new s3deploy.BucketDeployment(this, name, {
-      sources: [s3deploy.Source.asset('../web/src')], // 'folder' contains your empty files at the right locations
+      sources: [s3deploy.Source.asset('web/src')], // 'folder' contains your empty files at the right locations
       destinationBucket: bucket,
       distribution: distribution,
       distributionPaths: ['/*'],
@@ -195,7 +195,7 @@ class ADCWebInfraStack extends Stack {
   //
   ////////////////////////////////////////////////////////////////////////
   viewerRequestHandler(name) {
-    const filePath = 'lib/handlers/viewerRequestHandler.js';
+    const filePath = 'infra/lib/handlers/viewerRequestHandler.js';
     const fn = new cloudfront.Function(this, name, {
       code: cloudfront.FunctionCode.fromFile({
         filePath: filePath,

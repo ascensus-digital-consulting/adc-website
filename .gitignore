@@ -3,3 +3,5 @@ package-lock.json
 node_modules
 coverage
 .vscode
+.cdk.staging
+cdk.out
