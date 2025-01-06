@@ -4,9 +4,13 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
-    "test": "jest --coverage --passWithNoTests"
+    "aws-cdk": "2.173.2",
+    "test": "jest --coverage --passWithNoTests",
+    "cdk": "cdk"
   },
   "dependencies": {
-    "cdk": "^2.173.2"
+    "cdk": "^2.173.2",
+    "aws-cdk-lib": "2.173.2",
+    "constructs": "^10.0.0"
   }
 }
