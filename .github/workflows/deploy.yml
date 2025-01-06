@@ -38,7 +38,7 @@ jobs:
         run: |
           cd ./infra
           npm install
-          npm install -g aws-cdk
+        # npm install -g aws-cdk
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -49,7 +49,8 @@ jobs:
 
       - name: Create stack
         run: |
-          cd ./infra
+          npm install -g aws-cdk
+
           cdk deploy --require-approval never \
             -c aliasRecordName=${{ vars.ALIAS_RECORD_NAME }} \
             -c bucketName=${{ vars.BUCKET_NAME }} \
