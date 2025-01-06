@@ -16,12 +16,13 @@ function handler(event) {
 ////////////////////////////////////////////////////////////////////////
 function authzHandler(event) {
   let authzHeaders = event.request.headers.authorization;
+  let requestOrResponse = event.request;
   let expected = 'Basic Y2hyaXN0b3BoZXI6YmluZ28h';
 
   let production = isProduction(event.request.headers);
   let authzSuccess = authzHeaders && authzHeaders.value === expected;
+
   let requiresAuthz = !(production || authzSuccess);
-  let requestOrResponse = event.request;
 
   if (requiresAuthz) {
     requestOrResponse = configureResponse();
@@ -74,4 +75,8 @@ function configureResponse() {
       },
     },
   };
+}
+
+if (console.error) {
+  module.exports = handler;
 }
