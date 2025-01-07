@@ -25,6 +25,7 @@ describe('stack configuration', () => {
   beforeAll(() => {
     const app = new cdk.App();
     const stack = new ADCWebInfraStack(app, names.stack, {
+
       env: { context: context },
     });
     template = Template.fromStack(stack);
