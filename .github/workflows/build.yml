@@ -1,0 +1,143 @@
+name: ADC website build
+run-name: Build ADC web application [@${{ github.actor }}]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  deploy-infra:
+    uses: ./.github/workflows/deploy-dev.yml
+    secrets: inherit
+
+  ui-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: deploy-infra
+
+    steps:
+      - name: Test website UI
+        run: echo 'TODO - create UI tests'
+
+  #  destroy-infra:
+  #    runs-on: ubuntu-latest
+  #    if: ${{ !cancelled() }}
+  #    timeout-minutes: 10
+  #    needs: ui-tests
+  #    environment: DEV
+  #
+  #    steps:
+  #      - name: Install AWS CLI
+  #        run: npm install aws
+  #
+  #      - name: Configure AWS credentials
+  #        uses: aws-actions/configure-aws-credentials@v4
+  #        with:
+  #          role-to-assume: arn:aws:iam::030460844096:role/GitHubAction-AssumeRoleWithAction
+  #          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+  #          aws-region: us-west-1
+  #
+  #      - name: Destroy infrastructure
+  #        run: aws cloudformation delete-stack --stack-name ${{ vars.STACK_NAME }} --region ${{ vars.AWS_REGION }}
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test and coverage
+        run: npm test
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Check the Quality Gate status.
+      - name: Check Sonar quality gate status
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  security-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript-typescript
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - if: matrix.build-mode == 'manual'
+        shell: bash
+        run: |
+          echo 'If you are using a "manual" build mode for one or more of the' \
+            'languages you are analyzing, replace this with the commands to build' \
+            'your code, for example:'
+          echo '  make bootstrap'
+          echo '  make release'
+          exit 1
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{matrix.language}}'
+
+  tag-with-version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [static-analysis, security-tests, ui-tests]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Increment version
+        id: increment-version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: 'v'
+          major_pattern: '(#MAJOR)'
+          minor_pattern: '(#MINOR)'
+          version_format: '${major}.${minor}.${patch}+${increment}'
+          namespace: adc-web
+          change_path: web/src infra/bin infra/lib
