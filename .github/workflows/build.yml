@@ -23,28 +23,7 @@ jobs:
     steps:
       - name: Test website UI
         run: echo 'TODO - create UI tests'
-
-  #  destroy-infra:
-  #    runs-on: ubuntu-latest
-  #    if: ${{ !cancelled() }}
-  #    timeout-minutes: 10
-  #    needs: ui-tests
-  #    environment: DEV
-  #
-  #    steps:
-  #      - name: Install AWS CLI
-  #        run: npm install aws
-  #
-  #      - name: Configure AWS credentials
-  #        uses: aws-actions/configure-aws-credentials@v4
-  #        with:
-  #          role-to-assume: arn:aws:iam::030460844096:role/GitHubAction-AssumeRoleWithAction
-  #          role-session-name: GitHub_to_AWS_via_FederatedOIDC
-  #          aws-region: us-west-1
-  #
-  #      - name: Destroy infrastructure
-  #        run: aws cloudformation delete-stack --stack-name ${{ vars.STACK_NAME }} --region ${{ vars.AWS_REGION }}
-
+        
   static-analysis:
     runs-on: ubuntu-latest
     timeout-minutes: 10
