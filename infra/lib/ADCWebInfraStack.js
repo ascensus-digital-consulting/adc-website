@@ -6,6 +6,7 @@ const cloudfront = require('aws-cdk-lib/aws-cloudfront');
 const origins = require('aws-cdk-lib/aws-cloudfront-origins');
 const route53 = require('aws-cdk-lib/aws-route53');
 const targets = require('aws-cdk-lib/aws-route53-targets');
+const iam = require('aws-cdk-lib/aws-iam');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
 class ADCWebInfraStack extends Stack {
