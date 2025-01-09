@@ -20,22 +20,98 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/default.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <div class="home-screen-container">
-      <h1>Ascensus Digital Consulting</h1>
-      <p>fast flow for software teams</p>
-      <p>
-        <a href="mailto:connect@ascensusdigitalconsulting.com"
-          >connect@ascensusdigitalconsulting.com</a
-        >
-        | <a href="tel:(341) 222-8402">(341) 222-8402</a>
-      </p>
-    </div>
+    <nav class="navbar">
+      <div class="navbar-flex container">
+        <img src="./images/temp-logo.png" alt="Ascensus Digital Consulting" />
+
+        <div class="main-menu-items">
+          <ul class="main-menu-list">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#knoowledge">Knowledge</a></li>
+            <li><a href="#connect">Connect</a></li>
+            <li>
+              <a href="https://facebook.com" target="_blank"
+                ><i class="fa-brands fa-facebook"></i
+              ></a>
+            </li>
+            <li>
+              <a href="https://bsky.app" target="_blank"
+                ><i class="fa-brands fa-bluesky"></i
+              ></a>
+            </li>
+            <li>
+              <a href="https://linkedin.com" target="_blank"
+                ><i class="fa-brands fa-linkedin"></i
+              ></a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+          <!-- Hamburger Button -->
+          <div class="mobile-menu-toggle">
+            <i class="fas fa-bars fa-2x"></i>
+          </div>
+          <!-- Mobile Menu Items -->
+          <div class="mobile-menu-items">
+            <ul class="mobile-menu-list">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#knoowledge">Knowledge</a></li>
+              <li><a href="#connect">Connect</a></li>
+              <li>
+                <a href="https://facebook.com" target="_blank"
+                  ><i class="fa-brands fa-facebook"></i
+                ></a>
+              </li>
+              <li>
+                <a href="https://bsky.app" target="_blank"
+                  ><i class="fa-brands fa-bluesky"></i
+                ></a>
+              </li>
+              <li>
+                <a href="https://linkedin.com" target="_blank"
+                  ><i class="fa-brands fa-linkedin"></i
+                ></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="container hero-flex">
+        <div class="hero-content">
+          <h1>Lorem, ipsum dolor.</h1>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus,
+            perferendis magnam! Natus delectus impedit odio, possimus unde illo
+            dolor porro!
+          </p>
+          <a href="#" class="btn">Lorem, ipsum.</a>
+        </div>
+        <img src="https://picsum.photos/1000/600" alt="View from office" />
+      </div>
+    </header>
+
+    <script src="./js/script.js"></script>
   </body>
 </html>
 <!-- Test 20 -->
