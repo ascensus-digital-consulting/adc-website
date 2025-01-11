@@ -28,13 +28,14 @@ class ADCWebInfraBootstrapStack extends Stack {
         ),
         new iam.ArnPrincipal('arn:aws:iam::030460844096:user/christopher.marsh')
       ),
-      managedPolicies: [policy],
+      inlinePolicies: {
+        ADCDeployWebAppPolicy: policy.document,
+      },
     });
   }
 
   #configurePolicy() {
-    return new iam.ManagedPolicy(this, 'ADCDeployWebAppPolicy', {
-      managedPolicyName: 'ADC_DeployWebApp',
+    return new iam.Policy(this, 'ADCDeployWebAppPolicy', {
       statements: [
         new iam.PolicyStatement({
           sid: 'AllowCDK',
