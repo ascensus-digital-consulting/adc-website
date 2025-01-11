@@ -1,9 +1,6 @@
 #!/usr/bin/env node
+import { App } from 'aws-cdk-lib';
+import { ADCWebInfraBootstrapStack } from '../lib/ADCWebInfraBootstrapStack';
 
-const cdk = require('aws-cdk-lib');
-const {
-  ADCWebInfraBootstrapStack,
-} = require('../lib/ADCWebInfraBootstrapStack');
-
-const app = new cdk.App();
+const app = new App();
 const stack = new ADCWebInfraBootstrapStack(app, 'ADCWebInfraBootstrapStack');
