@@ -1,7 +1,7 @@
 const { Capture, Match, Template } = require('aws-cdk-lib/assertions');
 const cdk = require('aws-cdk-lib');
 const sns = require('aws-cdk-lib/aws-sns');
-const { ADCWebInfraStack } = require('../../lib/ADCWebInfraStack');
+const { WebAppStack } = require('../../lib/WebAppStack');
 
 describe('stack configuration', () => {
   let template;
@@ -24,7 +24,7 @@ describe('stack configuration', () => {
 
   beforeAll(() => {
     const app = new cdk.App();
-    const stack = new ADCWebInfraStack(app, names.stack, {
+    const stack = new WebAppStack(app, names.stack, {
       env: { context: context },
     });
     template = Template.fromStack(stack);
@@ -349,64 +349,64 @@ describe('stack configuration', () => {
     });
 
     test('static stack utilities', () => {
-      const props = ADCWebInfraStack.configureStackProps(app);
+      const props = WebAppStack.configureStackProps(app);
       expect(props).toMatchObject(expected);
     });
 
     test('static stack utilities with undefined alias record name', () => {
       required.splice(0, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined bucket name', () => {
       required.splice(1, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined cache policy name', () => {
       required.splice(2, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined deployment name', () => {
       required.splice(3, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined distribution name', () => {
       required.splice(4, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined stack name', () => {
       required.splice(5, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined viewer request handler name', () => {
       required.splice(6, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined domains', () => {
       required.splice(7, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined hosted zone id', () => {
       required.splice(9, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined zone name', () => {
       required.splice(10, 1);
-      expect(() => ADCWebInfraStack.configureStackProps(app)).toThrow();
+      expect(() => WebAppStack.configureStackProps(app)).toThrow();
     });
 
     test('static stack utilities with undefined host', () => {
       required.splice(8, 1);
       expected.env.context.host = '';
-      const props = ADCWebInfraStack.configureStackProps(app);
+      const props = WebAppStack.configureStackProps(app);
       expect(props).toMatchObject(expected);
     });
   });

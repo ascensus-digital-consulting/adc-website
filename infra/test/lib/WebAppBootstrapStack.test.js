@@ -1,16 +1,14 @@
 const { Capture, Match, Template } = require('aws-cdk-lib/assertions');
 const cdk = require('aws-cdk-lib');
 const sns = require('aws-cdk-lib/aws-sns');
-const {
-  ADCWebInfraBootstrapStack,
-} = require('../../lib/ADCWebInfraBootstrapStack');
+const { WebAppBootstrapStack } = require('../../lib/WebAppBootstrapStack');
 
 describe('stack configuration', () => {
   let template;
 
   beforeAll(() => {
     const app = new cdk.App();
-    const stack = new ADCWebInfraBootstrapStack(app, 'TestStack');
+    const stack = new WebAppBootstrapStack(app, 'TestStack');
     template = Template.fromStack(stack);
   });
 
