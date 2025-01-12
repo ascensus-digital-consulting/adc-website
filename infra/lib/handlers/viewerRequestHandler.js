@@ -17,15 +17,14 @@ function handler(event) {
 function authzHandler(event) {
   let authzHeaders = event.request.headers.authorization;
   let requestOrResponse = event.request;
-  let expected = 'Basic Y2hyaXN0b3BoZXI6YmluZ28h';
+  let expectedCreds = 'Basic Y2hyaXN0b3BoZXI6YmluZ28h';
 
-  let production = isProduction(event.request.headers);
-  let authzSuccess = authzHeaders && authzHeaders.value === expected;
+  let prod = production(event.request.headers);
+  let authorized = authzHeaders && authzHeaders.value === expectedCreds;
+  let requiresAuthz = !prod;
 
-  let requiresAuthz = !(production || authzSuccess);
-
-  if (requiresAuthz) {
-    requestOrResponse = configureResponse();
+  if (requiresAuthz && !authorized) {
+    requestOrResponse = http401();
   }
 
   return requestOrResponse;
@@ -51,7 +50,7 @@ function metadataRewriteHandler(event) {
 // Validates the Host header against a list of production domains
 //
 ////////////////////////////////////////////////////////////////////////
-function isProduction(headers) {
+function production(headers) {
   let productionDomains = ['ascensus.digital', 'www.ascensus.digital'];
   let production = productionDomains.includes(headers.host.value);
   return production;
@@ -63,7 +62,7 @@ function isProduction(headers) {
 // been provided
 //
 ////////////////////////////////////////////////////////////////////////
-function configureResponse() {
+function http401() {
   return {
     statusCode: 401,
     statusDescription: 'Unauthorized',

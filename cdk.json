@@ -1,5 +1,5 @@
 {
-  "app": "node infra/bin/ADCWebInfra.js",
+  "app": "node infra/bin/webAppInfra.js",
   "watch": {
     "include": ["**"],
     "exclude": [

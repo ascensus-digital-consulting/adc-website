@@ -2,7 +2,7 @@ const cdk = require('aws-cdk-lib');
 const { Stack } = cdk;
 const iam = require('aws-cdk-lib/aws-iam');
 
-class ADCWebInfraBootstrapStack extends Stack {
+class WebAppBootstrapStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -48,4 +48,4 @@ class ADCWebInfraBootstrapStack extends Stack {
   }
 }
 
-module.exports = { ADCWebInfraBootstrapStack };
+module.exports = { WebAppBootstrapStack };

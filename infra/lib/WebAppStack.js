@@ -9,7 +9,7 @@ const targets = require('aws-cdk-lib/aws-route53-targets');
 const iam = require('aws-cdk-lib/aws-iam');
 const { Certificate } = require('aws-cdk-lib/aws-certificatemanager');
 
-class ADCWebInfraStack extends Stack {
+class WebAppStack extends Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
@@ -229,7 +229,7 @@ class ADCWebInfraStack extends Stack {
       hostedZoneId: app.node.tryGetContext('hostedZoneId'),
       zoneName: app.node.tryGetContext('zoneName'),
     };
-    ADCWebInfraStack.#validateContext(context);
+    WebAppStack.#validateContext(context);
     return context;
   }
 
@@ -264,7 +264,7 @@ class ADCWebInfraStack extends Stack {
   //
   ////////////////////////////////////////////////////////////////////////
   static configureStackProps(app) {
-    const context = ADCWebInfraStack.#configureContext(app);
+    const context = WebAppStack.#configureContext(app);
     const props = {
       env: {
         account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -277,4 +277,4 @@ class ADCWebInfraStack extends Stack {
   }
 }
 
-module.exports = { ADCWebInfraStack };
+module.exports = { WebAppStack };
