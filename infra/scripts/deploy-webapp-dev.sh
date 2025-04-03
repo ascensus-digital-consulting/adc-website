@@ -10,15 +10,6 @@ export AWS_SESSION_TOKEN=$(echo "$assumeRoleResult" | jq -r '.Credentials.Sessio
 
 # Create IAM resources
 cdk deploy \
-  -c aliasRecordName=ADCWebDevARecord \
-  -c bucketName=ADCWebDevBucket \
-  -c cachePolicyName=ADCWebDevCachePolicy \
-  -c deploymentName=ADCWebDevDeployment \
-  -c distributionName=ADCWebDevDistribution \
-  -c domains=dev.ascensus.digital \
-  -c environment=dev \
-  -c stackName=ADCWebDevStack \
+  -c stackId=ADCWebDev \
   -c host=dev \
-  -c viewerRequestHandlerName=ADCWebDevViewerRequestHandler \
-  -c hostedZoneId=Z02235921WTFRIR8NQIBR \
   -c zoneName=ascensus.digital

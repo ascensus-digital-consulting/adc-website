@@ -1,0 +1,542 @@
+Resources:
+  ADCWebDevBucketFDE030C7:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: aws-cdk:auto-delete-objects
+          Value: "true"
+        - Key: aws-cdk:cr-owned:0e7ec150
+          Value: "true"
+      VersioningConfiguration:
+        Status: Enabled
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevBucket/Resource
+  ADCWebDevBucketPolicyA4DF2A54:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: ADCWebDevBucketFDE030C7
+      PolicyDocument:
+        Statement:
+          - Action: s3:*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+            Effect: Deny
+            Principal:
+              AWS: "*"
+            Resource:
+              - Fn::GetAtt:
+                  - ADCWebDevBucketFDE030C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ADCWebDevBucketFDE030C7
+                        - Arn
+                    - /*
+          - Action:
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:PutBucketPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+                  - Arn
+            Resource:
+              - Fn::GetAtt:
+                  - ADCWebDevBucketFDE030C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ADCWebDevBucketFDE030C7
+                        - Arn
+                    - /*
+          - Action: s3:GetObject
+            Condition:
+              StringEquals:
+                AWS:SourceArn:
+                  Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - ":cloudfront::"
+                      - Ref: AWS::AccountId
+                      - :distribution/
+                      - Ref: ADCWebDevDistribution71C84FC1
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - ADCWebDevBucketFDE030C7
+                      - Arn
+                  - /*
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevBucket/Policy/Resource
+  ADCWebDevBucketAutoDeleteObjectsCustomResource68CE6D31:
+    Type: Custom::S3AutoDeleteObjects
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F
+          - Arn
+      BucketName:
+        Ref: ADCWebDevBucketFDE030C7
+    DependsOn:
+      - ADCWebDevBucketPolicyA4DF2A54
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevBucket/AutoDeleteObjectsCustomResource/Default
+  CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role
+  CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-030460844096-us-west-1
+        S3Key: faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip
+      Timeout: 900
+      MemorySize: 128
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+          - Arn
+      Runtime: nodejs20.x
+      Description:
+        Fn::Join:
+          - ""
+          - - "Lambda function for auto-deleting objects in "
+            - Ref: ADCWebDevBucketFDE030C7
+            - " S3 bucket."
+    DependsOn:
+      - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler
+      aws:asset:path: asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6
+      aws:asset:property: Code
+  ADCWebDevCachePolicy71A46C30:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 1800
+        MaxTTL: 3600
+        MinTTL: 1800
+        Name: ADCWebDevStackADCWebDevCachePolicy6147BADD-us-west-1
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevCachePolicy/Resource
+  ADCWebDevViewerRequestHandler91BB3DBB:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode: |
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Runs HTTP pipeline tasks on the Cloudfront viewer request event
+        //
+        ////////////////////////////////////////////////////////////////////////
+        function handler(event) {
+          metadataRewriteHandler(event);
+          let requestOrResponse = authzHandler(event);
+          return requestOrResponse;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Configures HTTP Basic authz
+        //
+        ////////////////////////////////////////////////////////////////////////
+        function authzHandler(event) {
+          let authzHeaders = event.request.headers.authorization;
+          let requestOrResponse = event.request;
+          let expectedCreds = 'Basic Y2hyaXN0b3BoZXI6YmluZ28h';
+
+          let prod = production(event.request.headers);
+          let authorized = authzHeaders && authzHeaders.value === expectedCreds;
+          let requiresAuthz = !prod;
+
+          if (requiresAuthz && !authorized) {
+            requestOrResponse = http401();
+          }
+
+          return requestOrResponse;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Rewrites requests for /metadata to /metadata.json
+        //
+        ////////////////////////////////////////////////////////////////////////
+        function metadataRewriteHandler(event) {
+          let request = event.request;
+          let uri = request.uri;
+          let regex = /metadata\/?$/i;
+
+          uri = uri.replace(regex, 'metadata.json');
+          request.uri = uri;
+          return request;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Validates the Host header against a list of production domains
+        //
+        ////////////////////////////////////////////////////////////////////////
+        function production(headers) {
+          let productionDomains = ['ascensus.digital', 'www.ascensus.digital'];
+          let production = productionDomains.includes(headers.host.value);
+          return production;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+        // Configure response when authz is required but no credentials have
+        // been provided
+        //
+        ////////////////////////////////////////////////////////////////////////
+        function http401() {
+          return {
+            statusCode: 401,
+            statusDescription: 'Unauthorized',
+            headers: {
+              'www-authenticate': {
+                value: 'Basic realm="Enter credentials"',
+              },
+            },
+          };
+        }
+
+        /* istanbul ignore next */
+        if (console.error) {
+          module.exports = handler;
+        }
+      FunctionConfig:
+        Comment: us-west-1ADCWebDevStackADerRequestHandler1B303727
+        Runtime: cloudfront-js-2.0
+      Name: us-west-1ADCWebDevStackADerRequestHandler1B303727
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevViewerRequestHandler/Resource
+  ADCWebDevDistributionOrigin1S3OriginAccessControl450BC3E0:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: ADCWebDevStackADCWebDevDistrOrigin1S3OriginAccessControl59171631
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevDistribution/Origin1/S3OriginAccessControl/Resource
+  ADCWebDevDistribution71C84FC1:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - dev.ascensus.digital
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachePolicyId:
+            Ref: ADCWebDevCachePolicy71A46C30
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN:
+                Fn::GetAtt:
+                  - ADCWebDevViewerRequestHandler91BB3DBB
+                  - FunctionARN
+          TargetOriginId: ADCWebDevStackADCWebDevDistributionOrigin149E44A38
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        Origins:
+          - DomainName:
+              Fn::GetAtt:
+                - ADCWebDevBucketFDE030C7
+                - RegionalDomainName
+            Id: ADCWebDevStackADCWebDevDistributionOrigin149E44A38
+            OriginAccessControlId:
+              Fn::GetAtt:
+                - ADCWebDevDistributionOrigin1S3OriginAccessControl450BC3E0
+                - Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:030460844096:certificate/43b0f99a-a402-4ff1-916c-687c79bcef1d
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevDistribution/Resource
+  ADCWebDevARecord86684D20:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName:
+          Fn::GetAtt:
+            - ADCWebDevDistribution71C84FC1
+            - DomainName
+        HostedZoneId:
+          Fn::FindInMap:
+            - AWSCloudFrontPartitionHostedZoneIdMap
+            - Ref: AWS::Partition
+            - zoneId
+      HostedZoneId: Z02235921WTFRIR8NQIBR
+      Name: dev.ascensus.digital.
+      Type: A
+    DependsOn:
+      - ADCWebDevARecordDeleteExistingRecordSetCustomResource4D738C44
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevARecord/Resource
+  ADCWebDevARecordDeleteExistingRecordSetCustomResource4D738C44:
+    Type: Custom::DeleteExistingRecordSet
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomDeleteExistingRecordSetCustomResourceProviderHandlerAD00231E
+          - Arn
+      HostedZoneId: Z02235921WTFRIR8NQIBR
+      RecordName: dev.ascensus.digital.
+      RecordType: A
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevARecord/DeleteExistingRecordSetCustomResource/Default
+  CustomDeleteExistingRecordSetCustomResourceProviderRole03A7ED08:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: Inline
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: route53:GetChange
+                Resource: "*"
+              - Effect: Allow
+                Action: route53:ListResourceRecordSets
+                Resource: arn:aws:route53:::hostedzone/Z02235921WTFRIR8NQIBR
+              - Effect: Allow
+                Action: route53:ChangeResourceRecordSets
+                Resource: arn:aws:route53:::hostedzone/Z02235921WTFRIR8NQIBR
+                Condition:
+                  ForAllValues:StringEquals:
+                    route53:ChangeResourceRecordSetsRecordTypes:
+                      - A
+                    route53:ChangeResourceRecordSetsActions:
+                      - DELETE
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::DeleteExistingRecordSetCustomResourceProvider/Role
+  CustomDeleteExistingRecordSetCustomResourceProviderHandlerAD00231E:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-030460844096-us-west-1
+        S3Key: 19b765b3007697e38afc7319a4583e4c9c97bc200fa0c3baa092c6c017abc47c.zip
+      Timeout: 900
+      MemorySize: 128
+      Handler: __entrypoint__.handler
+      Role:
+        Fn::GetAtt:
+          - CustomDeleteExistingRecordSetCustomResourceProviderRole03A7ED08
+          - Arn
+      Runtime: nodejs20.x
+    DependsOn:
+      - CustomDeleteExistingRecordSetCustomResourceProviderRole03A7ED08
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::DeleteExistingRecordSetCustomResourceProvider/Handler
+      aws:asset:path: asset.19b765b3007697e38afc7319a4583e4c9c97bc200fa0c3baa092c6c017abc47c
+      aws:asset:property: Code
+  ADCWebDevDeploymentAwsCliLayerFAC64386:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      Content:
+        S3Bucket: cdk-hnb659fds-assets-030460844096-us-west-1
+        S3Key: d05f411f7ba433656b2a05b59c3b3049e9944647af407b68bb90d2d918e00997.zip
+      Description: /opt/awscli/aws
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevDeployment/AwsCliLayer/Resource
+      aws:asset:path: asset.d05f411f7ba433656b2a05b59c3b3049e9944647af407b68bb90d2d918e00997.zip
+      aws:asset:is-bundled: false
+      aws:asset:property: Content
+  ADCWebDevDeploymentCustomResource1294D74A:
+    Type: Custom::CDKBucketDeployment
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536
+          - Arn
+      SourceBucketNames:
+        - cdk-hnb659fds-assets-030460844096-us-west-1
+      SourceObjectKeys:
+        - 215f1c6e056830fb8b0b51f949c4248cad3446dcb48791d3bbf8121d9769e48e.zip
+      DestinationBucketName:
+        Ref: ADCWebDevBucketFDE030C7
+      Prune: true
+      DistributionId:
+        Ref: ADCWebDevDistribution71C84FC1
+      DistributionPaths:
+        - /*
+      OutputObjectKeys: true
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/ADCWebDevDeployment/CustomResource/Default
+  CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource
+  CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              - arn:aws:s3:::cdk-hnb659fds-assets-030460844096-us-west-1
+              - arn:aws:s3:::cdk-hnb659fds-assets-030460844096-us-west-1/*
+          - Action:
+              - s3:Abort*
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+              - s3:PutObject
+              - s3:PutObjectLegalHold
+              - s3:PutObjectRetention
+              - s3:PutObjectTagging
+              - s3:PutObjectVersionTagging
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - ADCWebDevBucketFDE030C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ADCWebDevBucketFDE030C7
+                        - Arn
+                    - /*
+          - Action:
+              - cloudfront:CreateInvalidation
+              - cloudfront:GetInvalidation
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF
+      Roles:
+        - Ref: CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource
+  CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-030460844096-us-west-1
+        S3Key: c6358465bf49dfae556bb430bf9c81fa578c221b82c308e3707901b1dd654762.zip
+      Environment:
+        Variables:
+          AWS_CA_BUNDLE: /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+      Handler: index.handler
+      Layers:
+        - Ref: ADCWebDevDeploymentAwsCliLayerFAC64386
+      Role:
+        Fn::GetAtt:
+          - CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265
+          - Arn
+      Runtime: python3.11
+      Timeout: 900
+    DependsOn:
+      - CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF
+      - CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource
+      aws:asset:path: asset.c6358465bf49dfae556bb430bf9c81fa578c221b82c308e3707901b1dd654762
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VQTWvDMAz9Lb273powdk5TdtpYSWDX4Dpqp9axi2U3FOP/PhyXpoPt9D4kwXsq+Oq15MVCjLSU/WmpcMdD64Q8MTFSF6jkYe3lCRyr9/rGMmyNQnmd7ZvOYi0IIpPK+H5vjXY81EJ+w3zzKN+8lg6NTv6db5CcxZ2fRFt+WjygrqQEotpoZ41K6//Yj8eRWeMdvJQ8VA1IY/u0kVkLLjIqu9DDWZnrANrxXGBzN5ggAke8ShCZEsOuFzzUe/0urmC/wNIUEfVBgTNzg79qRYZi4KExCqYUCeenZBYjqz05MzRAxluZN+/812hrzQV7sOnfbErYOnFAfWCPxx/ifE5ezt6plLsTI0mFvBqpVjhViUybHviRni5FwVcFf14cCXFpvXY4AG8y/gCzshzDNAIAAA==
+    Metadata:
+      aws:cdk:path: ADCWebDevStack/CDKMetadata/Default
+Mappings:
+  AWSCloudFrontPartitionHostedZoneIdMap:
+    aws:
+      zoneId: Z2FDTNDATAQYW2
+    aws-cn:
+      zoneId: Z3RFFRIM2A3IF5
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+

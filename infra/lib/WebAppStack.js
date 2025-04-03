@@ -15,7 +15,14 @@ class WebAppStack extends Stack {
 
     // Obtain context values from environment
     const context = props.env.context;
-    const names = context.resourceNames;
+    const names = {
+      bucket: `${context.stackId}Bucket`,
+      cachePolicy: `${context.stackId}CachePolicy`,
+      viewerRequestHandler: `${context.stackId}ViewerRequestHandler`,
+      distribution: `${context.stackId}Distribution`,
+      aliasRecord: `${context.stackId}ARecord`,
+      deployment: `${context.stackId}Deployment`,
+    };
 
     // Create bucket
     const bucket = this.#bucket(names.bucket);
@@ -32,7 +39,7 @@ class WebAppStack extends Stack {
     );
     const distributionProps = this.#distributionProps(
       defaultBehavior,
-      context.domains
+      context.host ? `${context.host}.${context.zoneName}` : context.zoneName
     );
     const distribution = this.#distribution(
       names.distribution,
@@ -40,7 +47,7 @@ class WebAppStack extends Stack {
     );
 
     // Create A record
-    const zone = this.#hostedZone(context.hostedZoneId, context.zoneName);
+    const zone = this.#hostedZone(context.zoneName);
     this.#aliasRecord(distribution, context.host, names.aliasRecord, zone);
 
     // Deploy website code to S3
@@ -174,18 +181,15 @@ class WebAppStack extends Stack {
 
   ////////////////////////////////////////////////////////////////////////
   //
-  // Configure the Route53 hosted zone for DNS updates
+  // Configure the Route53 hosted zone for DNS updates using lookup
   //
   ////////////////////////////////////////////////////////////////////////
-  #hostedZone(hostedZoneId, zoneName) {
-    const zone = route53.HostedZone.fromHostedZoneAttributes(
-      this,
-      'ADCImportedZone',
-      {
-        hostedZoneId,
-        zoneName,
-      }
-    );
+  #hostedZone(zoneName) {
+    const zone = route53.HostedZone.fromLookup(this, 'ADCImportedZone', {
+      domainName: zoneName,
+    });
+    // Access the zone id via zone.hostedZoneId if needed
+    // console.log(zone.hostedZoneId);
     return zone;
   }
 
@@ -204,76 +208,6 @@ class WebAppStack extends Stack {
       runtime: cloudfront.FunctionRuntime.JS_2_0,
     });
     return fn;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Obtain all required context values provided with the cdk command
-  //
-  ////////////////////////////////////////////////////////////////////////
-  static #configureContext(app) {
-    const context = {
-      resourceNames: {
-        aliasRecord: app.node.tryGetContext('aliasRecordName'),
-        bucket: app.node.tryGetContext('bucketName'),
-        cachePolicy: app.node.tryGetContext('cachePolicyName'),
-        deployment: app.node.tryGetContext('deploymentName'),
-        distribution: app.node.tryGetContext('distributionName'),
-        stack: app.node.tryGetContext('stackName'),
-        viewerRequestHandler: app.node.tryGetContext(
-          'viewerRequestHandlerName'
-        ),
-      },
-      domains: app.node.tryGetContext('domains'),
-      host: app.node.tryGetContext('host') || '',
-      hostedZoneId: app.node.tryGetContext('hostedZoneId'),
-      zoneName: app.node.tryGetContext('zoneName'),
-    };
-    WebAppStack.#validateContext(context);
-    return context;
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Validate that all of the required values are defined
-  //
-  ////////////////////////////////////////////////////////////////////////
-  static #validateContext(context) {
-    const undefContextValues = Object.entries(context).filter(
-      (entry) => entry[1] === undefined
-    );
-    const undefNameValues = Object.entries(context.resourceNames).filter(
-      (entry) => entry[1] === undefined
-    );
-    const undefAllValues = undefContextValues
-      .concat(undefNameValues)
-      .map((entry) => entry[0]);
-
-    if (undefAllValues.length > 0) {
-      throw Error(
-        `The following context values are undefined: ${undefAllValues.join(
-          ', '
-        )}. Please specify context values using the --context (or -c) switch when using cdk deploy.`
-      );
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////////////
-  //
-  // Define the properties to provide to the stack
-  //
-  ////////////////////////////////////////////////////////////////////////
-  static configureStackProps(app) {
-    const context = WebAppStack.#configureContext(app);
-    const props = {
-      env: {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-        region: process.env.CDK_DEFAULT_REGION,
-        context: context,
-        stackName: context.resourceNames.stack,
-      },
-    };
-    return props;
   }
 }
 

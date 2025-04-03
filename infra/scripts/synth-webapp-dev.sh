@@ -9,6 +9,10 @@ export AWS_SECRET_ACCESS_KEY=$(echo "$assumeRoleResult" | jq -r '.Credentials.Se
 export AWS_SESSION_TOKEN=$(echo "$assumeRoleResult" | jq -r '.Credentials.SessionToken')
 
 # Create IAM resources
-cdk deploy \
-  -c stackId=ADCWebProd \
+cdk synth \
+  -c stackId=ADCWebDev \
+  -c domains=dev.ascensus.digital \
+  -c environment=dev \
+  -c host=dev \
+  -c hostedZoneId=Z02235921WTFRIR8NQIBR \
   -c zoneName=ascensus.digital
